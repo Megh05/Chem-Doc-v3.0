@@ -15,6 +15,7 @@ export interface Template {
   fileSize: number;
   placeholders: string[]; // Dynamic placeholders extracted by LLM
   html?: string; // Template HTML structure for rendering
+  fieldMapping?: string[]; // Intelligent field mapping for placeholders
   createdAt: Date;
   updatedAt: Date;
 }

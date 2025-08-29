@@ -493,9 +493,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const structure = await parseTemplateStructure(templatePath);
       let intelligentMapping: string[] | null = null;
       
-      // Use fallback mapping for now (AI mapping has parsing issues)
-      intelligentMapping = getFallbackMappingSimple(Object.keys(documentData));
-      console.log('🎯 Using fallback mapping:', intelligentMapping);
+      console.log('🔍 Template analysis for document generation:');
+      console.log('  - Template ID:', template.id);
+      console.log('  - Template has fieldMapping:', !!(template as any).fieldMapping);
+      console.log('  - Template fieldMapping length:', (template as any).fieldMapping?.length || 0);
+      console.log('  - Template fieldMapping:', (template as any).fieldMapping);
+      
+      // Use the stored intelligent mapping from the template if available
+      if ((template as any).fieldMapping && (template as any).fieldMapping.length > 0) {
+        intelligentMapping = (template as any).fieldMapping;
+        console.log('🎯 Using stored intelligent field mapping:', intelligentMapping);
+      } else {
+        // Fallback to generating new intelligent mapping
+        try {
+          const config = loadConfig();
+          intelligentMapping = await mapExtractedDataToTemplate(
+            documentData,
+            structure.html,
+            config.apiSettings.mistralApiKey || process.env.MISTRAL_API_KEY || ''
+          );
+          console.log('🎯 Generated new intelligent field mapping:', intelligentMapping);
+          
+          // Store the new mapping for future use
+          if (intelligentMapping.length > 0) {
+            await storage.updateTemplate(template.id, { fieldMapping: intelligentMapping });
+            console.log('💾 Stored new field mapping in template');
+          }
+        } catch (mappingError) {
+          console.warn('⚠️ Failed to generate intelligent mapping, using fallback:', mappingError);
+          intelligentMapping = getFallbackMappingSimple(Object.keys(documentData));
+        }
+      }
       
 
       if (format === 'pdf') {
@@ -505,14 +533,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Replace {} placeholders in sequence using intelligent mapping
         if (intelligentMapping) {
+          console.log('🔧 Replacing placeholders with intelligent mapping...');
+          
+          // First, replace named placeholders for better accuracy
+          Object.keys(documentData).forEach(key => {
+            const value = documentData[key] || '';
+            const namedPlaceholder = `{${key}}`;
+            if (htmlContent.includes(namedPlaceholder)) {
+              htmlContent = htmlContent.replace(new RegExp(namedPlaceholder, 'g'), value.toString());
+              console.log(`  ✅ Replaced {${key}} with: ${value}`);
+            }
+          });
+          
+          // Then handle any remaining {} placeholders with intelligent mapping
           let placeholderIndex = 0;
           htmlContent = htmlContent.replace(/\{\}/g, () => {
             if (placeholderIndex < intelligentMapping!.length) {
               const fieldName = intelligentMapping![placeholderIndex];
               const value = documentData[fieldName] || '';
               placeholderIndex++;
+              console.log(`  🔄 Replaced placeholder ${placeholderIndex} with ${fieldName}: ${value}`);
               return value.toString();
             }
+            console.log(`  ⚠️ No more mapping for placeholder ${placeholderIndex + 1}`);
             return '';
           });
         } else {
@@ -773,7 +816,19 @@ async function fillTemplateWithData(templatePath: string, extractedData: Record<
     // Replace placeholders in the XML
     let modifiedXml = documentXml;
     
-    // First, replace {} placeholders in sequence using intelligent mapping
+    console.log('🔧 DOCX: Replacing placeholders with intelligent mapping...');
+    
+    // First, replace named placeholders for better accuracy
+    Object.keys(extractedData).forEach(key => {
+      const value = escapeXml(extractedData[key]?.toString() || '');
+      const namedPlaceholder = `{${key}}`;
+      if (modifiedXml.includes(namedPlaceholder)) {
+        modifiedXml = modifiedXml.replace(new RegExp(namedPlaceholder, 'g'), value);
+        console.log(`  ✅ DOCX: Replaced {${key}} with: ${value}`);
+      }
+    });
+    
+    // Then handle any remaining {} placeholders with intelligent mapping
     if (intelligentMapping) {
       let placeholderIndex = 0;
       modifiedXml = modifiedXml.replace(/\{\}/g, () => {
@@ -781,8 +836,10 @@ async function fillTemplateWithData(templatePath: string, extractedData: Record<
           const fieldName = intelligentMapping![placeholderIndex];
           const value = extractedData[fieldName] || '';
           placeholderIndex++;
+          console.log(`  🔄 DOCX: Replaced placeholder ${placeholderIndex} with ${fieldName}: ${value}`);
           return escapeXml(value.toString());
         }
+        console.log(`  ⚠️ DOCX: No more mapping for placeholder ${placeholderIndex + 1}`);
         return '';
       });
     } else {
@@ -794,25 +851,28 @@ async function fillTemplateWithData(templatePath: string, extractedData: Record<
           const fieldName = fieldNames[placeholderIndex];
           const value = extractedData[fieldName] || '';
           placeholderIndex++;
+          console.log(`  🔄 DOCX: Fallback placeholder ${placeholderIndex} with ${fieldName}: ${value}`);
           return escapeXml(value.toString());
         }
         return '';
       });
     }
     
-    // Also replace any named placeholders that might exist
+    // Also replace any other placeholder formats that might exist
     Object.keys(extractedData).forEach(key => {
       const value = escapeXml(extractedData[key]?.toString() || '');
       // Replace various placeholder formats
       const placeholderPatterns = [
-        new RegExp(`\\{${key}\\}`, 'g'),
         new RegExp(`\\{\\{${key}\\}\\}`, 'g'),
         new RegExp(`___${key}___`, 'g'),
         new RegExp(`\\[${key}\\]`, 'g')
       ];
       
       placeholderPatterns.forEach(pattern => {
-        modifiedXml = modifiedXml.replace(pattern, value);
+        if (modifiedXml.match(pattern)) {
+          modifiedXml = modifiedXml.replace(pattern, value);
+          console.log(`  ✅ DOCX: Replaced alternative placeholder for ${key}`);
+        }
       });
     });
 
