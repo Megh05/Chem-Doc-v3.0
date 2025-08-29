@@ -1,6 +1,10 @@
-import { FileText, Download, Eye } from "lucide-react";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FileText, Download, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import type { ProcessingJob } from "@shared/schema";
 
 interface ProcessingHistoryProps {
@@ -8,6 +12,42 @@ interface ProcessingHistoryProps {
 }
 
 export default function ProcessingHistory({ jobs }: ProcessingHistoryProps) {
+  const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const deleteJobMutation = useMutation({
+    mutationFn: async (jobId: string) => {
+      const response = await apiRequest('DELETE', `/api/processing-jobs/${jobId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Processing job deleted successfully",
+      });
+      // Refresh the processing jobs list
+      queryClient.invalidateQueries({ queryKey: ['/api/processing-jobs'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete processing job",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setDeletingJobId(null);
+    }
+  });
+
+  const handleDeleteJob = (jobId: string) => {
+    if (window.confirm('Are you sure you want to delete this processing job? This action cannot be undone.')) {
+      setDeletingJobId(jobId);
+      deleteJobMutation.mutate(jobId);
+    }
+  };
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -124,6 +164,20 @@ export default function ProcessingHistory({ jobs }: ProcessingHistoryProps) {
                       data-testid={`button-view-${job.id}`}
                     >
                       View
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteJob(job.id)}
+                      disabled={deletingJobId === job.id}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      data-testid={`button-delete-${job.id}`}
+                    >
+                      {deletingJobId === job.id ? (
+                        <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 </td>

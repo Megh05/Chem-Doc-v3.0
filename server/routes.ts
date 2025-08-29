@@ -771,8 +771,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Processing jobs delete endpoint
+  app.delete("/api/processing-jobs/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteProcessingJob(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Processing job not found" });
+      }
+      res.json({ message: "Processing job deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to delete processing job", error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
-  return httpServer;
+  return httpServer
 }
 
 // Helper function to parse DOCX template structure
