@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle, FileText, Plus, Info, Upload } from "lucide-react";
+import { CheckCircle, FileText, Plus, Info, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
@@ -102,16 +102,18 @@ export default function TemplateSelection({
         {templates.map((template) => (
           <div
             key={template.id}
-            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+            className={`border rounded-lg p-4 transition-colors ${
               selectedTemplateId === template.id
                 ? "border-primary-500 bg-primary-50"
                 : "border-gray-200 hover:bg-gray-50"
             }`}
-            onClick={() => onTemplateSelected(template.id)}
             data-testid={`template-${template.id}`}
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
+              <div 
+                className="flex items-center flex-1 cursor-pointer"
+                onClick={() => onTemplateSelected(template.id)}
+              >
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                   selectedTemplateId === template.id ? 'bg-primary-100' : 'bg-gray-100'
                 }`}>
@@ -128,11 +130,28 @@ export default function TemplateSelection({
                   </p>
                 </div>
               </div>
-              {selectedTemplateId === template.id && (
-                <div className="w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 text-white" />
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {selectedTemplateId === template.id && (
+                  <div className="w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-white" />
+                  </div>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2 h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm(`Are you sure you want to delete "${template.name}"?`)) {
+                      deleteMutation.mutate(template.id);
+                    }
+                  }}
+                  data-testid={`button-delete-template-${template.id}`}
+                  title="Delete template"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}
