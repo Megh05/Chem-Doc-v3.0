@@ -9,9 +9,10 @@ import type { ProcessingJob } from "@shared/schema";
 
 interface ProcessingHistoryProps {
   jobs: ProcessingJob[];
+  onRefresh?: () => void;
 }
 
-export default function ProcessingHistory({ jobs }: ProcessingHistoryProps) {
+export default function ProcessingHistory({ jobs, onRefresh }: ProcessingHistoryProps) {
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -32,8 +33,23 @@ export default function ProcessingHistory({ jobs }: ProcessingHistoryProps) {
         title: "Success",
         description: "Processing job deleted successfully",
       });
-      // Refresh the processing jobs list
+      // Force refresh the processing jobs list
+      console.log('🔄 Invalidating processing jobs query...');
       queryClient.invalidateQueries({ queryKey: ['/api/processing-jobs'] });
+      
+      // Also try to refetch immediately
+      setTimeout(() => {
+        console.log('🔄 Forcing refetch of processing jobs...');
+        queryClient.refetchQueries({ queryKey: ['/api/processing-jobs'] });
+      }, 100);
+      
+      // Call the parent's refresh function if available
+      if (onRefresh) {
+        console.log('🔄 Calling parent refresh function...');
+        setTimeout(() => {
+          onRefresh();
+        }, 200);
+      }
     },
     onError: (error: any) => {
       toast({

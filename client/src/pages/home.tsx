@@ -22,7 +22,7 @@ export default function Home() {
 
   const templatesArray = Array.isArray(templates) ? templates : [];
 
-  const { data: processingJobs } = useQuery({
+  const { data: processingJobs, refetch: refetchJobs } = useQuery({
     queryKey: ["/api/processing-jobs"],
     refetchInterval: 2000, // Poll every 2 seconds for real-time updates
   });
@@ -132,7 +132,7 @@ export default function Home() {
           />
         )}
 
-        <ProcessingHistory jobs={jobsArray} />
+        <ProcessingHistory jobs={jobsArray} onRefresh={refetchJobs} />
       </main>
     </div>
   );

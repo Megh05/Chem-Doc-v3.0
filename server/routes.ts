@@ -777,13 +777,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log(`🗑️ Attempting to delete processing job: ${id}`);
       
+      // Get the current jobs before deletion for debugging
+      const jobsBefore = await storage.getProcessingJobs();
+      console.log(`📊 Jobs before deletion: ${jobsBefore.length}`);
+      
       const deleted = await storage.deleteProcessingJob(id);
       if (!deleted) {
         console.log(`❌ Processing job not found: ${id}`);
         return res.status(404).json({ message: "Processing job not found" });
       }
       
+      // Get the current jobs after deletion for debugging
+      const jobsAfter = await storage.getProcessingJobs();
+      console.log(`📊 Jobs after deletion: ${jobsAfter.length}`);
       console.log(`✅ Successfully deleted processing job: ${id}`);
+      
       res.status(200).json({ message: "Processing job deleted successfully" });
     } catch (error: any) {
       console.error(`❌ Failed to delete processing job ${id}:`, error);
