@@ -19,7 +19,13 @@ export default function ProcessingHistory({ jobs }: ProcessingHistoryProps) {
   const deleteJobMutation = useMutation({
     mutationFn: async (jobId: string) => {
       const response = await apiRequest('DELETE', `/api/processing-jobs/${jobId}`);
-      return response.json();
+      // The apiRequest function already handles errors, so if we get here, it's successful
+      try {
+        return await response.json();
+      } catch {
+        // If JSON parsing fails, return a default success message
+        return { message: "Processing job deleted successfully" };
+      }
     },
     onSuccess: () => {
       toast({

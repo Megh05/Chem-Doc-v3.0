@@ -1112,5 +1112,34 @@
     "errorMessage": null,
     "createdAt": "2025-08-29T07:36:59.614Z",
     "completedAt": "2025-08-29T07:37:04.619Z"
+  },
+  {
+    "documentId": "2d0a5153-4eb2-4aef-b7a6-fb216d69a80b",
+    "templateId": "c918f40e-e716-4763-9624-299cc54524d5",
+    "status": "completed",
+    "id": "ce3106c9-c44e-41e2-8503-496447f80bf6",
+    "ocrText": "# 山东焦点福瑞达生物股份有限公司\nShandong Focusfreda Biotech Co., Ltd.\n\nCERTIFICATE OF ANALYSIS\n\nNO.: C-250425510\n\nProduct name: Sodium hyaluronate\nGrade: Cosmetic grade\n\nAbbreviation: SH-TE\nProduction date: April 22,2025\n\nBatch No.: 25042211\nRetest Date: April 22,2027\n\nQuantity: 288.2kg\nStandard: Reference to ZL-01-026\n\nItem\nStandard\nResult\n\n1.Appearance\nWhite or almost white powder or granule\nComplies\n\n2.Sodium hyaluronate\n≥95.0%\n97.4%\n\n3.Appearance of solution\nA400mm≤0.01\n0.000\n\n4.Nucleic Acids\nA260mm≤0.5\n0.14\n\n5.pH(0.5% ap.sol.,25℃)\n5.0~8.5\n6.8\n\n6.Molecular weight\n1.50M~1.80M Da\n1.70M Da\n\n7.Protein\n≤0.1%\n0.04%\n\n8.Loss on drying\n≤10.0%\n6.8%\n\n9.Residue on Ignition\n≤20.0%\n<20.0%\n\n10.Chlorides\n≤0.5%\nComplies\n\n11.Iron\n≤80ppm\n<80ppm\n\n12.Heavy metal\n≤20ppm\nComplies\n\n13.Arsenic\n≤2ppm\n<2ppm\n\n14.Bacteria counts\n≤10cfu/g\n<10cfu/g\n\n15.Molds & Yeasts\n≤50cfu/g\n<10cfu/g\n\n16.Staphylococcus aureus, Leucovorax, Neogative/g\nNegative/g\nNegative\n\n17.Pseudomonas aeruginosa Negative/g\nNegative/g\n\nConclusion: up to the standard, reference to ZL-101-010\n\nReported by: 王晶晶, 郭晶晶, 王晶晶, 郭晶晶, 郭晶晶\n\nApproved by: 孔圣楠, 刘玲, 邱子玲\n\n电话: 400-090-5566 邮箱: sales@focusfreda.com 地址: 山东省济宁市曲阜市高铁新区经济开发区\nAdd: New Economic Development Zone of High Speed Rail, Qufu, Jining, Shandong, China.",
+    "extractedData": {
+      "batch_number": "25042211",
+      "appearance": "Complies",
+      "molecular_weight": "1.70M Da",
+      "sodium_hyaluronate_content": "97.4%",
+      "protein": "0.04%",
+      "loss_on_drying": "6.8%",
+      "ph": "6.8",
+      "staphylococcus_aureus": "Negative/g",
+      "pseudomonas_aeruginosa": "Negative/g",
+      "heavy_metal": "Complies",
+      "total_bacteria": "<10cfu/g",
+      "yeast_and_molds": "<10cfu/g",
+      "manufacturing_date": "April 22,2025",
+      "expiry_date": "April 22,2027"
+    },
+    "accuracy": 95,
+    "tokensExtracted": 157,
+    "processingTime": 6,
+    "errorMessage": null,
+    "createdAt": "2025-08-29T08:06:00.359Z",
+    "completedAt": "2025-08-29T08:06:06.562Z"
   }
 ]

@@ -773,14 +773,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Processing jobs delete endpoint
   app.delete("/api/processing-jobs/:id", async (req, res) => {
+    const { id } = req.params;
     try {
-      const { id } = req.params;
+      console.log(`🗑️ Attempting to delete processing job: ${id}`);
+      
       const deleted = await storage.deleteProcessingJob(id);
       if (!deleted) {
+        console.log(`❌ Processing job not found: ${id}`);
         return res.status(404).json({ message: "Processing job not found" });
       }
-      res.json({ message: "Processing job deleted successfully" });
+      
+      console.log(`✅ Successfully deleted processing job: ${id}`);
+      res.status(200).json({ message: "Processing job deleted successfully" });
     } catch (error: any) {
+      console.error(`❌ Failed to delete processing job ${id}:`, error);
       res.status(500).json({ message: "Failed to delete processing job", error: error.message });
     }
   });

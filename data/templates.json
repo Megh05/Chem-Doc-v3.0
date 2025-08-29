@@ -92,7 +92,7 @@
     ],
     "id": "c918f40e-e716-4763-9624-299cc54524d5",
     "createdAt": "2025-08-29T07:36:45.671Z",
-    "updatedAt": "2025-08-29T07:37:12.300Z",
+    "updatedAt": "2025-08-29T08:06:11.071Z",
     "html": "<p>CERTIFICATE OF ANALYSIS</p><p>Product Name:\tCOSCARE-H ACID</p><p>INCI Name:\tSodium Hyaluronate</p><p>Batch Number:\t{}</p><table><tr><td><p>Test Items</p></td><td><p>Specifications</p></td><td><p>Results</p></td></tr><tr><td><p>Appearance</p></td><td><p>White solid powder</p></td><td><p>{}</p></td></tr><tr><td><p>Molecular weight</p></td><td><p>(0.5 – 1.8) x 10<sup>6</sup></p></td><td><p>{}</p></td></tr><tr><td><p>Sodium hyaluronate content</p></td><td><p>≥ 95%</p></td><td><p>{}</p></td></tr><tr><td><p>Protein</p></td><td><p>≤ 0.1%</p></td><td><p>{}</p></td></tr><tr><td><p>Loss on drying</p></td><td><p>≤ 10%</p></td><td><p>{}</p></td></tr><tr><td><p>pH</p></td><td><p>5.0-8.5</p></td><td><p>{}</p></td></tr><tr><td><p>Staphylococcus Aureus</p></td><td><p>Negative</p></td><td><p>{}</p></td></tr><tr><td><p>Pseudomonas Aeruginosa</p></td><td><p>Negative</p></td><td><p>{}</p></td></tr><tr><td><p>Heavy metal</p></td><td><p>≤20 ppm</p></td><td><p>{}</p></td></tr><tr><td><p>Total Bacteria</p></td><td><p>&lt; 100 CFU/g</p></td><td><p>{}</p></td></tr><tr><td><p>Yeast and molds</p></td><td><p>&lt; 50 CFU/g</p></td><td><p>{}</p></td></tr></table><p><br /><br /><br />Manufacturing Date:                     {}</p><p>Expiry Date:                                   {}</p><p>ISSUED DATE: 24-04-2025 TEST RESULT: PASS</p>",
     "fieldMapping": [
       "batch_number",
