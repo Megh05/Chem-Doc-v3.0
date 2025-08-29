@@ -1,0 +1,148 @@
+Extracted Information
+
+Product Name
+Chemical Compound XR-450
+
+Inci Name
+Extracted inci_name
+
+Batch Number
+BTH-2024-0892
+
+Manufacturing Date
+2024-02-15
+
+Expiry Date
+Extracted expiry_date
+
+Appearance Result
+Extracted appearance_result
+
+Molecular Weight Result
+Extracted molecular_weight_result
+
+Sodium Hyaluronate Content Result
+Extracted sodium_hyaluronate_content_result
+
+Protein Content Result
+Extracted protein_content_result
+
+Loss On Drying Result
+Extracted loss_on_drying_result
+
+Ph Result
+Extracted ph_result
+
+Staphylococcus Aureus Result
+Extracted staphylococcus_aureus_result
+
+Pseudomonas Aeruginosa Result
+Extracted pseudomonas_aeruginosa_result
+
+Heavy Metal Content Result
+Extracted heavy_metal_content_result
+
+Total Bacteria Count Result
+Extracted total_bacteria_count_result
+
+Yeast And Molds Count Result
+Extracted yeast_and_molds_count_result
+
+Issued Date
+Extracted issued_date
+
+Test Result Conclusion
+Extracted test_result_conclusion
+
+Manufacturer Name
+Extracted manufacturer_name
+
+Manufacturer Address
+Extracted manufacturer_address
+
+Manufacturer Contact
+Extracted manufacturer_contact
+
+Certificate Number
+Extracted certificate_number
+
+Customer Name
+Extracted customer_name
+
+Customer Reference
+Extracted customer_reference
+
+Storage Conditions
+Extracted storage_conditions
+
+Shelf Life
+Extracted shelf_life
+
+Testing Method References
+Extracted testing_method_references
+
+Analyst Name
+Extracted analyst_name
+
+Approval Signature
+Extracted approval_signature
+
+Approval Date
+Extracted approval_date
+
+Revision Number
+Extracted revision_number
+
+Document Control Number
+Extracted document_control_number
+
+Regulatory Compliance Standards
+Extracted regulatory_compliance_standards
+
+Sample Receipt Date
+Extracted sample_receipt_date
+
+Testing Start Date
+Extracted testing_start_date
+
+Testing Completion Date
+Extracted testing_completion_date
+
+Test Method Version
+Extracted test_method_version
+
+Instrument Serial Numbers
+Extracted instrument_serial_numbers
+
+Calibration Dates
+Extracted calibration_dates
+
+Uncertainty Of Measurement
+Extracted uncertainty_of_measurement
+
+Limit Of Quantification
+Extracted limit_of_quantification
+
+Limit Of Detection
+Extracted limit_of_detection
+
+Sample Preparation Method
+Extracted sample_preparation_method
+
+Sample Quantity
+Extracted sample_quantity
+
+Sample Identification Code
+Extracted sample_identification_code
+
+Related Protocol Number
+Extracted related_protocol_number
+
+Deviation Notes
+Extracted deviation_notes
+
+Corrective Actions
+Extracted corrective_actions
+
+Distribution List
+Extracted distribution_list

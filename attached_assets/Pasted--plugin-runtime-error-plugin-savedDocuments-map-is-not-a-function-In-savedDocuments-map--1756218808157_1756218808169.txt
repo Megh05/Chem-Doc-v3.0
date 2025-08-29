@@ -1,0 +1,195 @@
+[plugin:runtime-error-plugin] savedDocuments.map is not a function. (In 'savedDocuments.map(
+        (document2) => /* @__PURE__ */ jsxDEV(Card, { "data-replit-metadata": "client/src/pages/history.tsx:129:10", "data-component-name": "Card", className: "p-6", children: /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:130:16", "data-component-name": "div", className: "flex items-start justify-between", children: [
+          /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:131:18", "data-component-name": "div", className: "flex-1", children: [
+            /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:132:20", "data-component-name": "div", className: "flex items-center mb-3", children: [
+              /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:133:22", "data-component-name": "div", className: "w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center", children: /* @__PURE__ */ jsxDEV(FileText, { "data-replit-metadata": "client/src/pages/history.tsx:134:24", "data-component-name": "FileText", className: "w-4 h-4 text-blue-600" }, void 0, false, {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 134,
+                columnNumber: 25
+              }, this) }, void 0, false, {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 133,
+                columnNumber: 23
+              }, this),
+              /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:136:22", "data-component-name": "div", className: "ml-3", children: [
+                /* @__PURE__ */ jsxDEV("h3", { "data-replit-metadata": "client/src/pages/history.tsx:137:24", "data-component-name": "h3", className: "text-lg font-semibold text-gray-900", "data-testid": `document-${document2.id}`, children: document2.name }, void 0, false, {
+                  fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                  lineNumber: 137,
+                  columnNumber: 25
+                }, this),
+                /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:140:24", "data-component-name": "div", className: "flex items-center text-gray-500 text-sm", children: [
+                  /* @__PURE__ */ jsxDEV(Calendar, { "data-replit-metadata": "client/src/pages/history.tsx:141:26", "data-component-name": "Calendar", className: "w-4 h-4 mr-1" }, void 0, false, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 141,
+                    columnNumber: 27
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("span", { "data-replit-metadata": "client/src/pages/history.tsx:142:26", "data-component-name": "span", children: [
+                    "Saved on ",
+                    new Date(document2.createdAt).toLocaleDateString()
+                  ] }, void 0, true, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 142,
+                    columnNumber: 27
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                  lineNumber: 140,
+                  columnNumber: 25
+                }, this)
+              ] }, void 0, true, {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 136,
+                columnNumber: 23
+              }, this)
+            ] }, void 0, true, {
+              fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+              lineNumber: 132,
+              columnNumber: 21
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:148:20", "data-component-name": "div", className: "text-sm text-gray-600 mb-4", children: [
+              /* @__PURE__ */ jsxDEV("p", { "data-replit-metadata": "client/src/pages/history.tsx:149:22", "data-component-name": "p", children: /* @__PURE__ */ jsxDEV("strong", { "data-replit-metadata": "client/src/pages/history.tsx:149:25", "data-component-name": "strong", children: "Data Preview:" }, void 0, false, {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 149,
+                columnNumber: 109
+              }, this) }, void 0, false, {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 149,
+                columnNumber: 23
+              }, this),
+              /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:150:22", "data-component-name": "div", className: "grid grid-cols-2 gap-2 mt-2", children: Object.entries(document2.finalData).slice(0, 6).map(
+                ([key, value]) => /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:152:20", "data-component-name": "div", className: "text-xs", children: [
+                  /* @__PURE__ */ jsxDEV("span", { "data-replit-metadata": "client/src/pages/history.tsx:153:28", "data-component-name": "span", className: "font-medium capitalize", children: [
+                    key.replace(/_/g, " "),
+                    ":"
+                  ] }, void 0, true, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 153,
+                    columnNumber: 29
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("span", { "data-replit-metadata": "client/src/pages/history.tsx:154:28", "data-component-name": "span", className: "ml-1 text-primary-600", children: String(value) }, void 0, false, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 154,
+                    columnNumber: 29
+                  }, this)
+                ] }, key, true, {
+                  fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                  lineNumber: 152,
+                  columnNumber: 21
+                }, this)
+              ) }, void 0, false, {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 150,
+                columnNumber: 23
+              }, this)
+            ] }, void 0, true, {
+              fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+              lineNumber: 148,
+              columnNumber: 21
+            }, this)
+          ] }, void 0, true, {
+            fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+            lineNumber: 131,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { "data-replit-metadata": "client/src/pages/history.tsx:161:18", "data-component-name": "div", className: "flex flex-col space-y-2", children: [
+            /* @__PURE__ */ jsxDEV(
+              Button,
+              {
+                "data-replit-metadata": "client/src/pages/history.tsx:162:20",
+                "data-component-name": "Button",
+                onClick: () => handleDownload(document2.id, "docx"),
+                disabled: downloadingId === document2.id,
+                size: "sm",
+                "data-testid": `download-docx-${document2.id}`,
+                children: [
+                  /* @__PURE__ */ jsxDEV(Download, { "data-replit-metadata": "client/src/pages/history.tsx:168:22", "data-component-name": "Download", className: "w-4 h-4 mr-2" }, void 0, false, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 168,
+                    columnNumber: 23
+                  }, this),
+                  downloadingId === document2.id ? "Downloading..." : "Download Word"
+                ]
+              },
+              void 0,
+              true,
+              {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 162,
+                columnNumber: 21
+              },
+              this
+            ),
+            /* @__PURE__ */ jsxDEV(
+              Button,
+              {
+                "data-replit-metadata": "client/src/pages/history.tsx:172:20",
+                "data-component-name": "Button",
+                variant: "outline",
+                onClick: () => handleDownload(document2.id, "pdf"),
+                disabled: downloadingId === document2.id,
+                size: "sm",
+                "data-testid": `download-pdf-${document2.id}`,
+                children: [
+                  /* @__PURE__ */ jsxDEV(Download, { "data-replit-metadata": "client/src/pages/history.tsx:179:22", "data-component-name": "Download", className: "w-4 h-4 mr-2" }, void 0, false, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 179,
+                    columnNumber: 23
+                  }, this),
+                  "Download PDF"
+                ]
+              },
+              void 0,
+              true,
+              {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 172,
+                columnNumber: 21
+              },
+              this
+            ),
+            /* @__PURE__ */ jsxDEV(
+              Button,
+              {
+                "data-replit-metadata": "client/src/pages/history.tsx:183:20",
+                "data-component-name": "Button",
+                variant: "outline",
+                size: "sm",
+                onClick: () => handleDelete(document2.id),
+                disabled: deleteMutation.isPending,
+                className: "text-red-600 hover:text-red-700",
+                "data-testid": `delete-${document2.id}`,
+                children: [
+                  /* @__PURE__ */ jsxDEV(Trash2, { "data-replit-metadata": "client/src/pages/history.tsx:191:22", "data-component-name": "Trash2", className: "w-4 h-4 mr-2" }, void 0, false, {
+                    fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                    lineNumber: 191,
+                    columnNumber: 23
+                  }, this),
+                  "Delete"
+                ]
+              },
+              void 0,
+              true,
+              {
+                fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+                lineNumber: 183,
+                columnNumber: 21
+              },
+              this
+            )
+          ] }, void 0, true, {
+            fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+            lineNumber: 161,
+            columnNumber: 19
+          }, this)
+        ] }, void 0, true, {
+          fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+          lineNumber: 130,
+          columnNumber: 17
+        }, this) }, document2.id, false, {
+          fileName: "/home/runner/workspace/client/src/pages/history.tsx",
+          lineNumber: 129,
+          columnNumber: 11
+        }, this)
+      )', 'savedDocuments.map' is undefined)
+Click outside, press Esc key, or fix the code to dismiss.
+You can also disable this overlay by setting server.hmr.overlay to false in vite.config.js.

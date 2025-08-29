@@ -1,0 +1,224 @@
+Mistral mapping failed: Error: No valid JSON array found in Mistral response
+    at mapExtractedDataToTemplate (/home/runner/workspace/server/lib/mistral.ts:717:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:349:28)
+📋 Using intelligent fallback mapping: [
+  'batch_number',
+  'manufacturing_date',
+  'expiry_date',
+  'appearance',
+  'molecular_weight',
+  'sodium_hyaluronate_content',
+  'protein',
+  'loss_on_drying',
+  'ph',
+  'staphylococcus_aureus',
+  'pseudomonas_aeruginosa',
+  'heavy_metal',
+  'total_bacteria',
+  'yeast_and_molds',
+  'issued_date',
+  'test_result'
+]
+8:13:24 PM [express] POST /api/intelligent-mapping 200 in 2216ms :: ["batch_number","manufacturing_d…
+8:13:25 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:27 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:30 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:32 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+🧠 Mistral template mapping response: Here's the JSON array with the field names in the correct order based on the semantic context of each placeholder:
+
+```json
+[
+  "batch_number",
+  "manufacturing_date",
+  "expiry_date",
+  "appearance",
+  "molecular_weight",
+  "sodium_hyaluronate_content",
+  "protein",
+  "loss_on_drying",
+  "ph",
+  "staphylococcus_aureus",
+  "pseudomonas_aeruginosa",
+  "heavy_metal",
+  "total_bacteria",
+  "yeast_and_molds",
+  "issued_date",
+  "test_result"
+]
+```
+
+The mapping follows the exact order of the placeholders in the template, with each field matched to its corresponding context:
+1. Batch Number → batch_number
+2. Manufacturing Date → manufacturing_date
+3. Expiry Date → expiry_date
+4. Appearance (results column) → appearance
+5. Molecular weight (results) → molecular_weight
+6. Sodium hyaluronate content (results) → sodium_hyaluronate_content
+7. Protein (results) → protein
+8. Loss on drying (results) → loss_on_drying
+9. pH (results) → ph
+10. Staphylococcus Aureus (results) → staphylococcus_aureus
+11. Pseudomonas Aeruginosa (results) → pseudomonas_aeruginosa
+12. Heavy metal (results) → heavy_metal
+13. Total Bacteria (results) → total_bacteria
+14. Yeast and molds (results) → yeast_and_molds
+15. Issued Date → issued_date (null in extracted data)
+16. Test Result → test_result (null in extracted data)
+Mistral mapping failed: Error: No valid JSON array found in Mistral response
+    at mapExtractedDataToTemplate (/home/runner/workspace/server/lib/mistral.ts:717:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:414:32)
+📋 Using intelligent fallback mapping: [
+  'batch_number',
+  'manufacturing_date',
+  'expiry_date',
+  'appearance',
+  'molecular_weight',
+  'sodium_hyaluronate_content',
+  'protein',
+  'loss_on_drying',
+  'ph',
+  'staphylococcus_aureus',
+  'pseudomonas_aeruginosa',
+  'heavy_metal',
+  'total_bacteria',
+  'yeast_and_molds',
+  'issued_date',
+  'test_result'
+]
+🎯 Using intelligent mapping: [
+  'batch_number',
+  'manufacturing_date',
+  'expiry_date',
+  'appearance',
+  'molecular_weight',
+  'sodium_hyaluronate_content',
+  'protein',
+  'loss_on_drying',
+  'ph',
+  'staphylococcus_aureus',
+  'pseudomonas_aeruginosa',
+  'heavy_metal',
+  'total_bacteria',
+  'yeast_and_molds',
+  'issued_date',
+  'test_result'
+]
+8:13:33 PM [express] POST /api/generate-document/c3179798-2331-4042-8d74-0bfb2e99c75d 200 in 3325ms
+8:13:34 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:36 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:38 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:46 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:48 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+🧠 Mistral template mapping response: Here's the JSON array with the field names in the correct order for each placeholder position:
+
+```json
+[
+  "batch_number",
+  "manufacturing_date",
+  "expiry_date",
+  "appearance",
+  "molecular_weight",
+  "sodium_hyaluronate_content",
+  "protein",
+  "loss_on_drying",
+  "ph",
+  "staphylococcus_aureus",
+  "pseudomonas_aeruginosa",
+  "heavy_metal",
+  "total_bacteria",
+  "yeast_and_molds",
+  "issued_date",
+  "test_result"
+]
+```
+
+The mapping follows the semantic context of each placeholder position in the template:
+1. Batch Number → batch_number
+2. Manufacturing Date → manufacturing_date
+3. Expiry Date → expiry_date
+4. Appearance (results column) → appearance
+5. Molecular weight (results) → molecular_weight
+6. Sodium hyaluronate content → sodium_hyaluronate_content
+7. Protein → protein
+8. Loss on drying → loss_on_drying
+9. pH → ph
+10. Staphylococcus Aureus → staphylococcus_aureus
+11. Pseudomonas Aeruginosa → pseudomonas_aeruginosa
+12. Heavy metal → heavy_metal
+13. Total Bacteria → total_bacteria
+14. Yeast and molds → yeast_and_molds
+15. Issued Date → issued_date (null in extracted data)
+16. Test Result → test_result (null in extracted data)
+Mistral mapping failed: Error: No valid JSON array found in Mistral response
+    at mapExtractedDataToTemplate (/home/runner/workspace/server/lib/mistral.ts:717:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:414:32)
+📋 Using intelligent fallback mapping: [
+  'batch_number',
+  'manufacturing_date',
+  'expiry_date',
+  'appearance',
+  'molecular_weight',
+  'sodium_hyaluronate_content',
+  'protein',
+  'loss_on_drying',
+  'ph',
+  'staphylococcus_aureus',
+  'pseudomonas_aeruginosa',
+  'heavy_metal',
+  'total_bacteria',
+  'yeast_and_molds',
+  'issued_date',
+  'test_result'
+]
+🎯 Using intelligent mapping: [
+  'batch_number',
+  'manufacturing_date',
+  'expiry_date',
+  'appearance',
+  'molecular_weight',
+  'sodium_hyaluronate_content',
+  'protein',
+  'loss_on_drying',
+  'ph',
+  'staphylococcus_aureus',
+  'pseudomonas_aeruginosa',
+  'heavy_metal',
+  'total_bacteria',
+  'yeast_and_molds',
+  'issued_date',
+  'test_result'
+]
+8:13:49 PM [express] POST /api/generate-document/c3179798-2331-4042-8d74-0bfb2e99c75d 200 in 2755ms
+8:13:50 PM [express] GET /api/processing-jobs 304 in 4ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:52 PM [express] GET /api/processing-jobs 200 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:54 PM [express] GET /api/processing-jobs 304 in 3ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:56 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:13:58 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:00 PM [express] GET /api/processing-jobs 304 in 3ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:02 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:04 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:07 PM [express] GET /api/processing-jobs 304 in 3ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:09 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:11 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:13 PM [express] GET /api/processing-jobs 304 in 1ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:15 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:17 PM [express] GET /api/processing-jobs 304 in 3ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:19 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:48 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:51 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:53 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:55 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:57 PM [express] GET /api/processing-jobs 304 in 1ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:14:59 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:01 PM [express] GET /api/processing-jobs 304 in 3ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:03 PM [express] GET /api/processing-jobs 304 in 1ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:05 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:08 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:10 PM [express] GET /api/processing-jobs 304 in 3ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:12 PM [express] GET /api/processing-jobs 304 in 1ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:14 PM [express] GET /api/processing-jobs 304 in 1ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:16 PM [express] GET /api/processing-jobs 304 in 1ms :: [{"documentId":"2ebe7796-93b7-46db-be39-…
+8:15:18 PM [express] GET /api/processing-jobs 304 in 2ms :: [{"documentId":"2ebe7796-93b7-46db-be39-
