@@ -34,7 +34,9 @@ export async function processDocumentWithMistral(
     let placeholders: string[] = [];
     if (templateHtml) {
       console.log('🔍 Identifying template placeholders...');
-      placeholders = await identifyTemplatePlaceholders(templateHtml, MISTRAL_API_KEY);
+      // Clean the template HTML before processing to remove image data
+      const cleanedTemplateHtml = cleanTextForLLM(templateHtml);
+      placeholders = await identifyTemplatePlaceholders(cleanedTemplateHtml, MISTRAL_API_KEY);
       console.log('🎯 Found template placeholders:', placeholders);
     }
     
@@ -700,14 +702,17 @@ export async function mapExtractedDataToTemplate(
   const config = loadConfig();
   const llmModel = config.apiSettings.llmModel || 'mistral-large-latest';
   
+  // Clean the template HTML before processing to remove image data
+  const cleanedTemplateHtml = cleanTextForLLM(templateHtml);
+  
   // Count the number of {} placeholders in the template
-  const placeholderCount = (templateHtml.match(/\{\}/g) || []).length;
+  const placeholderCount = (cleanedTemplateHtml.match(/\{\}/g) || []).length;
   
   const prompt = `
 You are an expert in document template analysis. Your task is to analyze a template HTML structure and intelligently map extracted data fields to the correct placeholder positions based on semantic context.
 
 TEMPLATE HTML STRUCTURE:
-${templateHtml}
+${cleanedTemplateHtml}
 
 EXTRACTED DATA FIELDS:
 ${JSON.stringify(extractedData, null, 2)}
@@ -832,7 +837,7 @@ If a position cannot be mapped to any field, use null for that position.
   } catch (error: any) {
     console.error('Mistral mapping failed:', error);
     // Fallback to basic field mapping based on common patterns
-    return getFallbackMapping(placeholderCount, Object.keys(extractedData), templateHtml);
+    return getFallbackMapping(placeholderCount, Object.keys(extractedData), cleanedTemplateHtml);
   }
 }
 
