@@ -81,16 +81,79 @@ export async function extractPlaceholdersFromTemplate(filePath: string): Promise
   }
 }
 
+// Text cleaning function to remove image metadata and problematic content
+function cleanTextForLLM(text: string): string {
+  console.log('🧹 Cleaning text for LLM processing...');
+  console.log('📏 Original text length:', text.length);
+  
+  let cleanedText = text;
+  
+  // Remove base64 image data (common patterns)
+  cleanedText = cleanedText.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[IMAGE_DATA_REMOVED]');
+  cleanedText = cleanedText.replace(/data:application\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[BINARY_DATA_REMOVED]');
+  
+  // Remove very long base64 strings (likely image data)
+  cleanedText = cleanedText.replace(/[A-Za-z0-9+/=]{100,}/g, '[LONG_BASE64_REMOVED]');
+  
+  // Remove image-related metadata
+  cleanedText = cleanedText.replace(/<img[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
+  cleanedText = cleanedText.replace(/<image[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
+  cleanedText = cleanedText.replace(/src="[^"]*"/gi, 'src="[REMOVED]"');
+  
+  // Remove HTML tags that might contain image references
+  cleanedText = cleanedText.replace(/<[^>]*>/g, ' ');
+  
+  // Remove excessive whitespace and normalize
+  cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+  
+  // Remove lines that are mostly special characters (likely corrupted image data)
+  const lines = cleanedText.split('\n');
+  const filteredLines = lines.filter(line => {
+    const cleanLine = line.trim();
+    if (cleanLine.length === 0) return false;
+    
+    // Remove lines that are mostly special characters
+    const specialCharRatio = (cleanLine.match(/[^a-zA-Z0-9\s\u4e00-\u9fff]/g) || []).length / cleanLine.length;
+    if (specialCharRatio > 0.8 && cleanLine.length > 20) {
+      return false;
+    }
+    
+    // Remove lines that look like corrupted data
+    if (cleanLine.match(/^[^\w\u4e00-\u9fff\s]+$/)) {
+      return false;
+    }
+    
+    return true;
+  });
+  
+  cleanedText = filteredLines.join('\n');
+  
+  // Limit text length to prevent API issues (keep it reasonable for LLM processing)
+  const maxLength = 8000; // Conservative limit
+  if (cleanedText.length > maxLength) {
+    console.log(`⚠️  Text too long (${cleanedText.length} chars), truncating to ${maxLength} chars`);
+    cleanedText = cleanedText.substring(0, maxLength) + '\n...[TEXT_TRUNCATED]';
+  }
+  
+  console.log('📏 Cleaned text length:', cleanedText.length);
+  console.log('🧹 Text cleaning completed');
+  
+  return cleanedText;
+}
+
 // Advanced Mistral AI analysis for template placeholder identification
 async function mistralTemplatePlaceholderAnalysis(text: string, apiKey: string): Promise<string[]> {
   const config = loadConfig();
   const llmModel = config.apiSettings.llmModel || 'mistral-large-latest';
   
+  // Clean the text before sending to LLM
+  const cleanedText = cleanTextForLLM(text);
+  
   const prompt = `
 You are an expert in analyzing document templates for chemical industry applications. Your task is to identify ALL placeholder fields in this template that need to be filled with data.
 
 TEMPLATE CONTENT:
-${text}
+${cleanedText}
 
 ANALYSIS INSTRUCTIONS:
 1. Identify every field that has a placeholder marker ({}, blank space, or area for data entry)
@@ -139,6 +202,8 @@ CRITICAL: Analyze the entire template structure and identify ALL placeholder pos
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Mistral API error details:', errorText);
       throw new Error(`Mistral AI API error: ${response.status} ${response.statusText}`);
     }
 
@@ -374,6 +439,9 @@ async function extractKeyValuePairs(text: string, placeholders: string[], apiKey
   const config = loadConfig();
   const llmModel = config.apiSettings.llmModel || 'mistral-large-latest';
   
+  // Clean the text before sending to LLM
+  const cleanedText = cleanTextForLLM(text);
+  
   const prompt = `
 You are an expert in chemical document analysis. Your task is to extract data from the document ONLY for the specified template fields.
 
@@ -381,7 +449,7 @@ TEMPLATE FIELDS TO EXTRACT (extract ONLY these fields):
 ${placeholders.map(p => `- ${p}`).join('\n')}
 
 Document text:
-${text}
+${cleanedText}
 
 CRITICAL INSTRUCTIONS:
 1. Extract data ONLY for the template fields listed above
