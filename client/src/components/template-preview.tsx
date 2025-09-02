@@ -151,6 +151,9 @@ export default function TemplatePreview({
                 font-style: italic;
                 border: 1px solid #fbbf24;
               }
+              .template-content img {
+                display: none !important;
+              }
             `
           }} />
           <div 
