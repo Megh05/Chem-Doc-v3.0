@@ -2,6 +2,9 @@ import { loadConfig, isParserV2 } from '../config';
 import { removeRepeatedFooters, normalizeNoData, normalizeEOL } from '../msds/cleanup';
 import { splitSectionsByNumber } from '../msds/sections';
 
+type Tag = 'HEADER' | 'FOOTER' | 'CONTENT';
+type TaggedLine = { i: number; tag: Tag; text: string };
+
 // Hardened Mistral API call function with retries
 async function callMistralAPI(prompt: string): Promise<string> {
   const config = loadConfig();
@@ -45,6 +48,32 @@ async function callMistralAPI(prompt: string): Promise<string> {
     }
   }
   return '';
+}
+
+/**
+ * Tag lines as HEADER, FOOTER, or CONTENT using LLM
+ * Preserves all content by tagging instead of deleting
+ */
+async function tagHeaderFooterLinesLLM(text: string): Promise<TaggedLine[] | null> {
+  const prompt = [
+    'You will tag each input line as HEADER, FOOTER, or CONTENT.',
+    'Only tag as HEADER/FOOTER if the line is clearly a corporate banner, contact line (Tel/Fax/Email/Address/Web), or repeated company footer.',
+    'Return a pure JSON array of {i, tag, text}. Do NOT rewrite text.',
+    '',
+    'INPUT:',
+    ...text.split('\n').map((l, i) => `${i}\t${l}`)
+  ].join('\n');
+
+  const out = await callMistralAPI(prompt);
+  try {
+    const jsonStart = out.indexOf('[');
+    const jsonEnd = out.lastIndexOf(']');
+    const json = out.slice(jsonStart, jsonEnd + 1);
+    const arr = JSON.parse(json);
+    return Array.isArray(arr) ? arr : null;
+  } catch {
+    return null; // fail-safe
+  }
 }
 
 // MSDS Section mapping from supplier to NTCB template
