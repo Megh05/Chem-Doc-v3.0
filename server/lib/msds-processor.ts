@@ -1,5 +1,6 @@
 import { loadConfig, isParserV2 } from '../config';
 import { removeRepeatedFooters, normalizeNoData, normalizeEOL } from '../msds/cleanup';
+import { splitSectionsByNumber } from '../msds/sections';
 
 // Simple Mistral API call function
 async function callMistralAPI(prompt: string): Promise<string> {
@@ -223,30 +224,55 @@ export async function processMSDSDocument(
     const filteredText = await filterHeadersAndFooters(ocrResult.text, MISTRAL_API_KEY);
     console.log('✅ MSDS header/footer filtering completed');
 
-    // Step 2: Parse MSDS sections using regex (use raw OCR text to preserve all content)
-    const sections = await parseMSDSSections(ocrResult.text);
+    // Step 2: Parse MSDS sections using V2 tolerant parser or fallback to regex
+    let sections = [];
+    if (isParserV2()) {
+      console.log('📋 V2 PARSER: Using tolerant header matcher...');
+      const prelim = splitSectionsByNumber(ocrResult.text);
+      // Fallback if not enough sections found
+      if (prelim.length >= 8) {
+        sections = prelim.map(s => ({
+          sectionNumber: s.number,
+          title: MSDS_SECTION_MAPPING[s.number as keyof typeof MSDS_SECTION_MAPPING]?.ntc || s.title,
+          content: s.content,
+          isAvailable: s.content.length > 20
+        }));
+        console.log(`📋 V2 PARSER: Found ${sections.length} sections with tolerant matcher`);
+      } else {
+        console.log(`📋 V2 PARSER: Fallback to regex parser (only ${prelim.length} sections found)`);
+        sections = await parseMSDSSections(ocrResult.text);
+      }
+    } else {
+      sections = await parseMSDSSections(ocrResult.text);
+    }
     console.log(`📋 MSDS sections parsed: ${sections.length} sections found`);
 
     // Step 3: Extract product identifiers (use raw OCR text)
     const productIdentifiers = extractProductIdentifiers(ocrResult.text);
 
-    // Step 4: Process each section content
-    const processedSections = await processMSDSSections(sections, MISTRAL_API_KEY);
+    // Step 4: Process each section content with appropriate cleaning
+    const processedSections = sections.map(s => ({
+      ...s,
+      content: isParserV2() ? cleanSectionContentV2(s.content) : cleanSectionContent(s.content)
+    }));
+    
+    // Apply AI enhancement if needed
+    const enhancedSections = await processMSDSSections(processedSections, MISTRAL_API_KEY);
 
     // Step 5: Generate structured JSON format
-    const structuredJSON = generateMSDSStructuredJSON(processedSections);
+    const structuredJSON = generateMSDSStructuredJSON(enhancedSections);
     console.log('📋 MSDS structured JSON generated');
 
     const processingLog = [
       `MSDS processing completed for ${filePath}`,
       `Found ${sections.length} sections`,
-      `Sections with content: ${processedSections.filter(s => s.isAvailable).length}`,
-      `Sections marked as unavailable: ${processedSections.filter(s => !s.isAvailable).length}`,
+      `Sections with content: ${enhancedSections.filter(s => s.isAvailable).length}`,
+      `Sections marked as unavailable: ${enhancedSections.filter(s => !s.isAvailable).length}`,
       `Structured JSON generated with ${structuredJSON.MSDS.length} sections`
     ];
 
     return {
-      sections: processedSections,
+      sections: enhancedSections,
       productIdentifiers,
       processingLog,
       rawOcrText: ocrResult.text, // Store the raw OCR text
