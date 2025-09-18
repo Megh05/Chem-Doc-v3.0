@@ -1,4 +1,5 @@
-import { loadConfig } from '../config';
+import { loadConfig, isParserV2 } from '../config';
+import { removeRepeatedFooters, normalizeNoData, normalizeEOL } from '../msds/cleanup';
 
 // Simple Mistral API call function
 async function callMistralAPI(prompt: string): Promise<string> {
@@ -376,7 +377,7 @@ async function parseMSDSSections(text: string): Promise<MSDSSection[]> {
         const emptySections = sections.filter(s => !s.isAvailable);
         if (emptySections.length > 0 && chunk.trim().length > 20) {
           const targetSection = emptySections[index % emptySections.length];
-          targetSection.content = cleanSectionContent(chunk);
+          targetSection.content = isParserV2() ? cleanSectionContentV2(chunk) : cleanSectionContent(chunk);
           targetSection.isAvailable = true;
           console.log(`📋 REGEX MSDS PARSER: Section ${targetSection.sectionNumber} - ${targetSection.title}: FALLBACK ASSIGNED (${targetSection.content.length} chars)`);
         }
@@ -464,7 +465,7 @@ function parseMSDSSectionsWithRegex(text: string): Array<{sectionNumber: number,
     let content = text.substring(startPos, endPos).trim();
     
     // Clean up the content
-    content = cleanSectionContent(content);
+    content = isParserV2() ? cleanSectionContentV2(content) : cleanSectionContent(content);
     
     if (content.length > 20) {
       sections.push({
@@ -578,6 +579,33 @@ function cleanSectionContent(content: string): string {
     .trim();
 
   return cleaned;
+}
+
+/**
+ * Clean section content using V2 approach (behind feature flag)
+ * More conservative and deterministic cleaning
+ */
+function cleanSectionContentV2(text: string): string {
+  let out = normalizeEOL(text);
+  // light touch: preserve bullets/numbers, collapse extra blank lines
+  out = out.replace(/\n{3,}/g, '\n\n');
+  // HTML/markdown noise
+  out = out.replace(/<br\s*\/?>/gi, '\n')
+           .replace(/\*\*(.*?)\*\*/g, '$1')
+           .replace(/__([^_]+)__/g, '$1')
+           .replace(/`{1,3}[^`]*`{1,3}/g, '');
+  // LaTeX-ish
+  out = out.replace(/\$\s*/g, '')
+           .replace(/\\mathrm\{([^}]+)\}/g, '$1')
+           .replace(/\\left\(|\\right\)/g, '')
+           .replace(/\\quad|\\beta|\\rightarrow/gi, ' ');
+  // normalize missing data phrases (do NOT delete them)
+  out = normalizeNoData(out);
+  // tidy spaces
+  return out.replace(/[ \t]+/g, ' ')
+            .replace(/ \n/g, '\n')
+            .replace(/\n +/g, '\n')
+            .trim();
 }
 
 /**
@@ -827,8 +855,15 @@ Return ONLY the cleaned text with headers and footers removed. Do not include an
     console.log(`📊 Header/footer filtering: ${text.length} → ${filteredText.length} characters`);
     
     // Additional regex-based cleanup for common footer patterns
-    const additionalCleanup = applyRegexFooterCleanup(filteredText);
+    let additionalCleanup = applyRegexFooterCleanup(filteredText);
     console.log(`📊 Additional regex cleanup: ${filteredText.length} → ${additionalCleanup.length} characters`);
+    
+    // Apply V2 cleanup utilities if feature flag is enabled
+    if (isParserV2()) {
+      additionalCleanup = removeRepeatedFooters(additionalCleanup);
+      additionalCleanup = normalizeEOL(additionalCleanup);
+      console.log(`📊 V2 cleanup applied: ${additionalCleanup.length} characters`);
+    }
     
     return additionalCleanup;
     
