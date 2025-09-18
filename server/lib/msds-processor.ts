@@ -76,6 +76,23 @@ async function tagHeaderFooterLinesLLM(text: string): Promise<TaggedLine[] | nul
   }
 }
 
+/**
+ * V2 Header/Footer filtering: deterministic + LLM tagging
+ * Combines deterministic cleanup with LLM-based line tagging
+ */
+async function filterHeadersAndFootersV2(text: string): Promise<string> {
+  let cleaned = removeRepeatedFooters(text);
+  const tagged = await tagHeaderFooterLinesLLM(cleaned).catch(() => null);
+  if (!tagged) return cleaned;
+
+  const kept = tagged
+    .filter(row => row.tag === 'CONTENT')
+    .map(row => row.text)
+    .join('\n');
+
+  return kept.trim() || cleaned;
+}
+
 // MSDS Section mapping from supplier to NTCB template
 export const MSDS_SECTION_MAPPING = {
   1: { supplier: 'Identification', ntc: 'Identification' },
@@ -258,7 +275,9 @@ export async function processMSDSDocument(
     
     // Step 1.5: Filter out headers and footers
     console.log('🧹 Filtering headers and footers from MSDS OCR text...');
-    const filteredText = await filterHeadersAndFooters(ocrResult.text, MISTRAL_API_KEY);
+    const filteredText = isParserV2()
+      ? await filterHeadersAndFootersV2(ocrResult.text)
+      : await filterHeadersAndFooters(ocrResult.text, MISTRAL_API_KEY);
     console.log('✅ MSDS header/footer filtering completed');
 
     // Step 2: Parse MSDS sections using V2 tolerant parser or fallback to regex
