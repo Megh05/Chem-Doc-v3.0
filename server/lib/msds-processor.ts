@@ -2,41 +2,49 @@ import { loadConfig, isParserV2 } from '../config';
 import { removeRepeatedFooters, normalizeNoData, normalizeEOL } from '../msds/cleanup';
 import { splitSectionsByNumber } from '../msds/sections';
 
-// Simple Mistral API call function
+// Hardened Mistral API call function with retries
 async function callMistralAPI(prompt: string): Promise<string> {
   const config = loadConfig();
   const MISTRAL_API_KEY = config.apiSettings.mistralApiKey || process.env.MISTRAL_API_KEY;
-  
-  if (!MISTRAL_API_KEY) {
-    throw new Error("Mistral API key not found");
+  if (!MISTRAL_API_KEY) throw new Error("Mistral API key not found");
+
+  const url = 'https://api.mistral.ai/v1/chat/completions';
+  const payload = {
+    model: 'mistral-large-latest',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.1,
+    max_tokens: 4000
+  };
+
+  const maxRetries = 3;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${MISTRAL_API_KEY}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data?.choices?.[0]?.message?.content ?? '';
+      }
+      if ([429,500,502,503,504].includes(res.status) && attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, Math.pow(2, attempt)*500));
+        continue;
+      }
+      throw new Error(`Mistral API error ${res.status}: ${await res.text().catch(()=>res.statusText)}`);
+    } catch (e) {
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, Math.pow(2, attempt)*500));
+        continue;
+      }
+      throw e;
+    }
   }
-
-  const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${MISTRAL_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'mistral-large-latest',
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.1,
-      max_tokens: 4000
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Mistral API error: ${response.status} ${response.statusText} - ${errorText}`);
-  }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
+  return '';
 }
 
 // MSDS Section mapping from supplier to NTCB template
