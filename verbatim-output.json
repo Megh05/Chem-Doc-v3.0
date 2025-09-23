@@ -1,0 +1,18 @@
+{
+  "1. Identification of the material and supplier:": "Product name: Chemical ABC\nManufacturer: Test Company Ltd.\nAddress: 123 Test Street, Test City, TC 12345\nTelephone: +1-555-0123\nFax: +1-555-0124\nEmail: info@testcompany.com\nEmergency phone: +1-555-0125",
+  "2. Hazards Identification:": "Signal word: Warning\nHazard statements: H315, H319\nPictogram: GHS07\nPrecautionary statements: P264, P280, P305+P351+P338",
+  "3. Composition/ Information on Ingredients:": "CAS No: 123-45-6\nConcentration: 95%\nSynonyms: Test Chemical ABC\nEINECS No: 123-456-7",
+  "4. First aid measures": "If inhaled: Move to fresh air\nIn case of skin contact: Wash with soap and water\nIn case of eye contact: Rinse with water for 15 minutes\nIf swallowed: Do not induce vomiting",
+  "5. Firefighting measures:": "Suitable extinguishing media: Water spray, foam, dry chemical\nSpecial hazards: None known\nProtective equipment: Self-contained breathing apparatus",
+  "6. Accidental release measures:": "Personal precautions: Wear protective equipment\nEnvironmental precautions: Prevent entry into waterways\nCleanup methods: Absorb with inert material",
+  "7. Handling and storage:": "Handling: Use in well-ventilated area\nStorage: Store in cool, dry place\nIncompatible materials: Strong oxidizers",
+  "8. Exposure controls Appropriate Engineering Controls:": "Engineering controls: Local exhaust ventilation\nPersonal protective equipment: Safety glasses, gloves\nExposure limits: TWA 10 mg/m³",
+  "9. Physical and Chemical Properties:": "Appearance: White powder\nOdor: Odorless\npH: 6.5-7.5\nMelting point: 150-160°C\nBoiling point: Not applicable\nSolubility: Soluble in water",
+  "10. Stability and reactivity": "Chemical stability: Stable under normal conditions\nReactivity: None known\nConditions to avoid: Heat, open flames\nIncompatible materials: Strong acids, strong bases",
+  "11. Toxicological information": "Acute toxicity: LD50 > 2000 mg/kg (oral, rat)\nSkin irritation: Not irritating\nEye irritation: Not irritating\nSensitization: Not sensitizing",
+  "12. ECOLOGICAL INFORMATION:": "Aquatic toxicity: LC50 > 100 mg/L (fish, 96h)\nPersistence: Not readily biodegradable\nBioaccumulation: Low bioaccumulation potential",
+  "13. Disposal considerations": "Waste disposal: Dispose in accordance with local regulations\nUnused product: Return to supplier or dispose as hazardous waste\nContaminated packaging: Dispose as hazardous waste",
+  "14. Transport Information:": "UN number: Not regulated\nProper shipping name: Not applicable\nTransport hazard class: Not applicable\nPacking group: Not applicable",
+  "15. Regulatory Information:": "TSCA: Listed\nREACH: Registered\nDSL: Listed\nOther regulations: Not applicable",
+  "16. Other Information:": "Date of preparation: 2024-01-01\nDate of revision: 2024-01-01\nVersion: 1.0\nPrepared by: Safety Department"
+}

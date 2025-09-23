@@ -1,8 +1,8 @@
 {
   "apiSettings": {
-    "mistralApiKey": "CQ3pvJOfl90ZDvu18BabtXSvu2lbRHYJ",
+    "mistralApiKey": "OCF0qAbqhSppgkA2CauOLIgid31RYkM9",
     "ocrEndpoint": "https://api.mistral.ai/v1/ocr/process",
-    "llmModel": "mistral-small-latest"
+    "llmModel": "mistral-large-latest"
   },
   "processingSettings": {
     "autoProcessing": true,

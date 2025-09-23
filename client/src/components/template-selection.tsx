@@ -25,7 +25,7 @@ export default function TemplateSelection({
   const [showUpload, setShowUpload] = useState(false);
   const [uploadData, setUploadData] = useState({
     name: "",
-    type: "CoA" as "CoA" | "TDS" | "MDMS"
+    type: "CoA" as "CoA" | "TDS" | "MSDS"
   });
   const { toast } = useToast();
   
@@ -192,13 +192,13 @@ export default function TemplateSelection({
               </label>
               <select
                 value={uploadData.type}
-                onChange={(e) => setUploadData({ ...uploadData, type: e.target.value as "CoA" | "TDS" | "MDMS" })}
+                onChange={(e) => setUploadData({ ...uploadData, type: e.target.value as "CoA" | "TDS" | "MSDS" })}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 data-testid="select-template-type"
               >
                 <option value="CoA">Certificate of Analysis (CoA)</option>
                 <option value="TDS">Technical Data Sheet (TDS)</option>
-                <option value="MDMS">Material Data Management Sheet (MDMS)</option>
+                <option value="MSDS">Material Safety Data Sheet (MSDS)</option>
               </select>
             </div>
             

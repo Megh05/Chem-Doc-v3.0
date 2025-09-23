@@ -5,7 +5,7 @@ interface ProgressStepsProps {
 
 export default function ProgressSteps({ currentStep, onStepClick }: ProgressStepsProps) {
   const steps = [
-    { id: 1, title: "Upload Documents", subtitle: "Supplier CoA/TDS/MDMS" },
+    { id: 1, title: "Upload Documents", subtitle: "Supplier CoA/TDS/MSDS" },
     { id: 2, title: "Select Template", subtitle: "Company format" },
     { id: 3, title: "AI Processing", subtitle: "OCR & Data Extraction" },
     { id: 4, title: "Review & Download", subtitle: "Final document" },

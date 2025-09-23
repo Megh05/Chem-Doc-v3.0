@@ -97,8 +97,8 @@ class FileStorage implements IStorage {
         },
         {
           id: randomUUID(),
-          name: "MDMS Template v1.5",
-          type: "MDMS",
+          name: "MSDS Template v1.5",
+          type: "MSDS",
           fileName: "mdms_template_v1.5.docx",
           fileSize: 42000,
           placeholders: [

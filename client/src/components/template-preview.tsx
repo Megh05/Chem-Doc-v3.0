@@ -175,7 +175,7 @@ export default function TemplatePreview({
         <div className="text-center border-b border-gray-200 pb-4">
           <h1 className="text-xl font-bold text-gray-900 uppercase">
             {template.type === 'TDS' ? 'TECHNICAL DATA SHEET' : 
-             template.type === 'MDMS' ? 'MATERIAL DATA MANAGEMENT SHEET' : 
+             template.type === 'MSDS' ? 'MATERIAL SAFETY DATA SHEET' : 
              'CERTIFICATE OF ANALYSIS'}
           </h1>
         </div>

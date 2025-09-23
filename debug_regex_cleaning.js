@@ -1,0 +1,84 @@
+const content = `### 1.1 Product identifier
+
+Product name
+CAS No.
+
+Sodium Hyaluronate
+$9067-32-7$
+1.2 Details of the supplier of the safety data sheet
+
+Manufacturer:
+Address:
+
+Telephone:
+Fax:
+E-Mail:
+Shandong Focusfreda Biotech Co., Ltd
+Add:New Economic Development Zone of High
+Speed Rail,Qufu,Jining,Shandong,China
+4000905566
++865373195599
+sales@focusfreda.com
+1.3 Emergency telephone number
+
+Emergency response service: 4000905566`;
+
+console.log('Original content:');
+console.log(content);
+console.log('\n---\n');
+
+let cleaned = content;
+
+// Test each cleaning step
+console.log('Step 1: LaTeX cleaning');
+cleaned = cleaned
+  .replace(/\\beta/g, 'β')
+  .replace(/\\rightarrow/g, '→')
+  .replace(/\\geqslant/g, '≥')
+  .replace(/\\leqslant/g, '≤')
+  .replace(/\\quad/g, ' ')
+  .replace(/\\left\(/g, '(')
+  .replace(/\\right\)/g, ')')
+  .replace(/\\mathrm\{([^}]+)\}/g, '$1')
+  .replace(/\\[a-zA-Z]+\{[^}]*\}/g, '') // Remove other LaTeX commands
+  .replace(/\$([^$]+)\$/g, '$1') // Remove LaTeX math formatting like $9067-32-7$
+  .replace(/\\[a-zA-Z]+/g, '') // Remove remaining LaTeX commands
+  .replace(/\{([^}]+)\}/g, '$1') // Remove remaining braces
+  .replace(/\s+/g, ' ') // Multiple spaces to single space
+  .trim();
+
+console.log('After LaTeX cleaning:');
+console.log(cleaned);
+console.log('Length:', cleaned.length);
+console.log('\n---\n');
+
+console.log('Step 2: Section header removal');
+cleaned = cleaned
+  .replace(/^#+\s*Section\s+\d+[^#]*$/gmi, '') // Remove section headers like "## Section 1 - Title"
+  .replace(/^#+\s*\d+\.\s*[^#]*$/gmi, '') // Remove numbered headers like "## 1. Title"
+  .replace(/^#{1,6}\s*/gm, '') // Remove markdown header symbols
+  .replace(/\s+/g, ' ') // Multiple spaces to single space
+  .trim();
+
+console.log('After section header removal:');
+console.log(cleaned);
+console.log('Length:', cleaned.length);
+console.log('\n---\n');
+
+// Test the specific regex patterns
+console.log('Testing specific regex patterns:');
+const patterns = [
+  { name: 'Section headers', pattern: /^#+\s*Section\s+\d+[^#]*$/gmi },
+  { name: 'Numbered headers', pattern: /^#+\s*\d+\.\s*[^#]*$/gmi },
+  { name: 'Markdown symbols', pattern: /^#{1,6}\s*/gm }
+];
+
+patterns.forEach(({ name, pattern }) => {
+  const matches = content.match(pattern);
+  if (matches) {
+    console.log(`${name} matches:`, matches);
+  } else {
+    console.log(`${name}: no matches`);
+  }
+});
+

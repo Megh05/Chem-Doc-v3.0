@@ -128,7 +128,7 @@ export default function DocumentUpload({ onDocumentUploaded, isActive, isComplet
         >
           <div className="flex flex-col items-center">
             <CloudUpload className="w-12 h-12 text-primary-500 mb-4" />
-            <p className="text-lg font-medium text-gray-900 mb-2">Upload CoA, TDS, or MDMS</p>
+            <p className="text-lg font-medium text-gray-900 mb-2">Upload CoA, TDS, or MSDS</p>
             <p className="text-sm text-gray-600 mb-4">Drag and drop files or click to browse</p>
             
             <input
