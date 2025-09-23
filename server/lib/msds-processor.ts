@@ -165,6 +165,54 @@ function preCleanParsingArtifacts(text: string): string {
     .trim();
 }
 
+// ---------- Post-processors to polish section bodies ----------
+function cleanVerbatim(input: string): string {
+  if (!input) return input;
+  return input
+    .replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n')
+    .replace(/<\/(p|li|h[1-6]|div)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/\$(.+?)\$/g, '$1')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function dropRecurringBoilerplateAcrossSections(sectionsByKey: Record<string, string>): void {
+  const allKeys = Object.keys(sectionsByKey);
+  if (allKeys.length < 2) return;
+  const [, ...restKeys] = allKeys;
+  const frequencyByLine = new Map<string, number>();
+  for (const key of restKeys) {
+    const seenThisSection = new Set<string>();
+    const lines = (sectionsByKey[key] || '')
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
+    for (const rawLine of lines) {
+      const normalized = rawLine.replace(/\s+/g, ' ');
+      if (seenThisSection.has(normalized)) continue;
+      seenThisSection.add(normalized);
+      frequencyByLine.set(normalized, (frequencyByLine.get(normalized) || 0) + 1);
+    }
+  }
+  const threshold = Math.ceil(restKeys.length * 0.6);
+  const boilerplate = new Set<string>(
+    Array.from(frequencyByLine.entries())
+      .filter(([, count]) => count >= threshold)
+      .map(([line]) => line)
+  );
+  for (const key of restKeys) {
+    const filtered = (sectionsByKey[key] || '')
+      .split(/\r?\n/)
+      .filter(line => !boilerplate.has(line.trim().replace(/\s+/g, ' ')))
+      .join('\n')
+      .trim();
+    sectionsByKey[key] = filtered;
+  }
+}
+
 // ---------- Canonical titles (for stability) ----------
 const CANON_16 = [
   'Identification of the material and supplier',
@@ -1700,6 +1748,16 @@ export async function processMSDSDocument(
 
     // Execute the 6-step solution
     const json16 = textToJson16Strict(ocrResult.text);
+
+    // Post-process: remove recurring boilerplate across sections (except Section 1), then clean Markdown/HTML
+    try {
+      dropRecurringBoilerplateAcrossSections(json16);
+      for (const key of Object.keys(json16)) {
+        json16[key] = cleanVerbatim(json16[key]);
+      }
+    } catch (ppErr) {
+      console.warn('⚠️ Post-processing warning (boilerplate/clean):', ppErr);
+    }
     
     console.log('📊 6-STEP SOLUTION Results:');
     console.log('  - Total sections found:', Object.keys(json16).length);
