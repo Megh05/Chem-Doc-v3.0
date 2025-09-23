@@ -2,6 +2,7 @@ import { loadConfig, isParserV2 } from '../config';
 import { removeRepeatedFooters, normalizeNoData, normalizeEOL, healOCRBreaks, advancedRepetitiveContentRemoval, normalizeUnicodeAndPunct, filterHeadersAndFooters as filterHeadersAndFootersLLM } from '../msds/cleanup';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { processMsds } from '../msds-new/pipeline';
 import { splitSectionsByNumber } from '../msds/sections';
 import {
@@ -80,6 +81,10 @@ const KNOWN_HEADER_FOOTER_PATTERNS = {
     /^[A-Z\s]{10,}$/ // 10+ character all caps lines
   ]
 };
+
+// Resolve __dirname in ESM context
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Function to load patterns from config file
 function loadPatternsFromConfig(): typeof KNOWN_HEADER_FOOTER_PATTERNS {
