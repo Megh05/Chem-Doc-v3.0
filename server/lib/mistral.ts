@@ -1,6 +1,7 @@
 import fs from 'fs';
 import FormData from 'form-data';
 import { loadConfig } from '../config';
+import { advancedRepetitiveContentRemoval, cleanExtractedData, normalizeUnicodeAndPunct } from '../msds/cleanup';
 
 interface MistralProcessingResult {
   extractedText: string;
@@ -43,14 +44,22 @@ export async function processDocumentWithMistral(
     // Step 3: Extract key-value pairs for identified placeholders only
     console.log('🤖 Starting targeted AI data extraction');
     const extractionResult = await extractKeyValuePairs(ocrResult.text, placeholders, MISTRAL_API_KEY);
-    console.log('🎯 AI EXTRACTED KEY-VALUE PAIRS:');
+    console.log('🎯 AI EXTRACTED KEY-VALUE PAIRS (BEFORE CLEANUP):');
     console.log('=' .repeat(80));
     console.log(JSON.stringify(extractionResult.data, null, 2));
     console.log('=' .repeat(80));
     
+    // Step 4: Clean the extracted data to remove repetitive content
+    console.log('🧹 Cleaning extracted data to remove repetitive content...');
+    const cleanedData = cleanExtractedData(extractionResult.data);
+    console.log('🎯 AI EXTRACTED KEY-VALUE PAIRS (AFTER CLEANUP):');
+    console.log('=' .repeat(80));
+    console.log(JSON.stringify(cleanedData, null, 2));
+    console.log('=' .repeat(80));
+    
     return {
       extractedText: ocrResult.text,
-      keyValuePairs: extractionResult.data,
+      keyValuePairs: cleanedData,
       accuracy: ocrResult.accuracy,
       tokensExtracted: ocrResult.tokens
     };
@@ -83,20 +92,19 @@ export async function extractPlaceholdersFromTemplate(filePath: string): Promise
   }
 }
 
-// Text cleaning function to remove image metadata and problematic content
+// Enhanced text cleaning function using advanced repetitive content removal
 function cleanTextForLLM(text: string): string {
   console.log('🧹 Cleaning text for LLM processing...');
   console.log('📏 Original text length:', text.length);
   
-  let cleanedText = text;
+  // Step 0: Early Unicode and punctuation normalization (CRITICAL FIRST STEP)
+  let pre = normalizeUnicodeAndPunct(text);
+  console.log('📏 After Unicode normalization:', pre.length);
   
-  // Remove base64 image data (common patterns)
-  cleanedText = cleanedText.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[IMAGE_DATA_REMOVED]');
-  cleanedText = cleanedText.replace(/data:application\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[BINARY_DATA_REMOVED]');
+  // Use the new advanced repetitive content removal system
+  let cleanedText = advancedRepetitiveContentRemoval(pre);
   
-  // Remove very long base64 strings (likely image data)
-  cleanedText = cleanedText.replace(/[A-Za-z0-9+/=]{100,}/g, '[LONG_BASE64_REMOVED]');
-  
+  // Additional LLM-specific cleanup
   // Remove image-related metadata
   cleanedText = cleanedText.replace(/<img[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
   cleanedText = cleanedText.replace(/<image[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
@@ -104,9 +112,6 @@ function cleanTextForLLM(text: string): string {
   
   // Remove HTML tags that might contain image references
   cleanedText = cleanedText.replace(/<[^>]*>/g, ' ');
-  
-  // Remove excessive whitespace and normalize
-  cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
   
   // Remove lines that are mostly special characters (likely corrupted image data)
   const lines = cleanedText.split('\n');
@@ -131,7 +136,7 @@ function cleanTextForLLM(text: string): string {
   cleanedText = filteredLines.join('\n');
   
   // Limit text length to prevent API issues (keep it reasonable for LLM processing)
-  const maxLength = 8000; // Conservative limit
+  const maxLength = 12000; // Increased limit since we have better cleanup now
   if (cleanedText.length > maxLength) {
     console.log(`⚠️  Text too long (${cleanedText.length} chars), truncating to ${maxLength} chars`);
     cleanedText = cleanedText.substring(0, maxLength) + '\n...[TEXT_TRUNCATED]';
@@ -387,10 +392,15 @@ async function processOCR(filePath: string, apiKey: string) {
       extractedText = result.text;
     }
     
+    // Filter out headers and footers using AI
+    console.log('🧹 Filtering headers and footers from OCR text...');
+    const filteredText = await filterHeadersAndFooters(extractedText, apiKey);
+    console.log('✅ Header/footer filtering completed');
+    
     return {
-      text: extractedText,
+      text: filteredText,
       accuracy: Math.floor(Math.random() * 5) + 95, // 95-99% accuracy simulation
-      tokens: extractedText ? extractedText.split(/\s+/).length : 0
+      tokens: filteredText ? filteredText.split(/\s+/).length : 0
     };
     
   } catch (error) {
@@ -705,6 +715,9 @@ export async function mapExtractedDataToTemplate(
   // Clean the template HTML before processing to remove image data
   const cleanedTemplateHtml = cleanTextForLLM(templateHtml);
   
+  // Clean the extracted data to remove repetitive content
+  const cleanedExtractedData = cleanExtractedData(extractedData);
+  
   // Count the number of {} placeholders in the template
   const placeholderCount = (cleanedTemplateHtml.match(/\{\}/g) || []).length;
   
@@ -715,7 +728,7 @@ TEMPLATE HTML STRUCTURE:
 ${cleanedTemplateHtml}
 
 EXTRACTED DATA FIELDS:
-${JSON.stringify(extractedData, null, 2)}
+${JSON.stringify(cleanedExtractedData, null, 2)}
 
 TASK: 
 The template has ${placeholderCount} placeholder positions marked as {} in sequential order. You need to determine which extracted data field should go in each position by analyzing the context around each placeholder.
@@ -938,4 +951,141 @@ Response format (JSON only):
     console.error('Intelligent extraction error:', error);
     throw new Error(`Intelligent extraction failed: ${error instanceof Error ? error.message : String(error)}`);
   }
+}
+
+/**
+ * Filter out headers and footers from OCR text using AI
+ */
+async function filterHeadersAndFooters(text: string, apiKey: string): Promise<string> {
+  try {
+    const config = loadConfig();
+    const llmModel = config.apiSettings.llmModel || 'mistral-large-latest';
+    
+    const prompt = `
+You are an expert in document analysis. Your task is to identify and remove headers and footers from a document while preserving the main content.
+
+DOCUMENT TEXT:
+${text}
+
+INSTRUCTIONS:
+1. Identify and REMOVE headers (typically at the top of the document) that contain:
+   - Company names, logos, or branding
+   - Document titles or headers that are repeated
+   - Navigation elements
+   - Page numbers at the top
+
+2. Identify and REMOVE footers (typically at the bottom of the document) that contain:
+   - Company contact information (addresses, phone numbers, emails)
+   - Copyright notices
+   - Page numbers at the bottom
+   - Legal disclaimers
+   - Website URLs
+   - Repeated company information
+   - Chinese text with contact details (电话, 传真, 邮箱, 地址, etc.)
+   - Company names in multiple languages
+   - Any text that appears to be repeated company branding
+   - Lines containing "Tel:", "Fax:", "Email:", "Add:", "Web:", "www."
+   - Lines with Chinese characters followed by English translations
+   - Company addresses and contact details
+
+3. SPECIFICALLY REMOVE these patterns:
+   - Lines containing phone numbers, fax numbers, email addresses
+   - Lines containing website URLs (www., .com, .cn, etc.)
+   - Lines containing company addresses
+   - Chinese text mixed with English contact information
+   - Lines that appear to be company branding or contact details
+
+4. Preserve ALL main document content including:
+   - Section headings (1. Identification, 2. Hazards, etc.)
+   - Technical specifications and data
+   - Tables and structured information
+   - Any content that appears to be the main document body
+   - Safety information and technical data
+
+5. Be AGGRESSIVE in removing contact information and company branding
+6. If you see Chinese characters mixed with contact details, remove those lines
+7. Remove any lines that look like company contact information, even if they appear in the middle
+
+Return ONLY the cleaned text with headers and footers removed. Do not include any explanations or comments.
+`;
+
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: llmModel,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 4000
+      })
+    });
+
+    if (!response.ok) {
+      console.error('Header/footer filtering API error:', response.status, response.statusText);
+      // Return original text if filtering fails
+      return text;
+    }
+
+    const result = await response.json();
+    const filteredText = result.choices?.[0]?.message?.content?.trim();
+    
+    if (!filteredText) {
+      console.warn('No filtered text returned from AI, using original text');
+      return text;
+    }
+    
+    console.log(`📊 Header/footer filtering: ${text.length} → ${filteredText.length} characters`);
+    
+    // Additional regex-based cleanup for common footer patterns
+    const additionalCleanup = applyRegexFooterCleanup(filteredText);
+    console.log(`📊 Additional regex cleanup: ${filteredText.length} → ${additionalCleanup.length} characters`);
+    
+    return additionalCleanup;
+    
+  } catch (error) {
+    console.error('Header/footer filtering error:', error);
+    // Return original text if filtering fails
+    return text;
+  }
+}
+
+/**
+ * Apply regex-based cleanup for common footer patterns
+ */
+function applyRegexFooterCleanup(text: string): string {
+  let cleanedText = text;
+  
+  // Remove lines containing Chinese characters mixed with contact info
+  cleanedText = cleanedText.replace(/^.*[\u4e00-\u9fff].*(?:Tel|Fax|Email|Add|Web|www|@).*$/gm, '');
+  
+  // Remove lines containing phone numbers, fax, email patterns
+  cleanedText = cleanedText.replace(/^.*(?:Tel|Fax|Email|电话|传真|邮箱).*$/gm, '');
+  
+  // Remove lines containing website URLs
+  cleanedText = cleanedText.replace(/^.*(?:www\.|\.com|\.cn|\.org).*$/gm, '');
+  
+  // Remove lines containing addresses (Add:, 地址)
+  cleanedText = cleanedText.replace(/^.*(?:Add:|地址).*$/gm, '');
+  
+  // Remove lines with Chinese company names followed by English
+  cleanedText = cleanedText.replace(/^.*[\u4e00-\u9fff].*<br>.*$/gm, '');
+  
+  // Remove lines containing only Chinese characters (likely company names)
+  cleanedText = cleanedText.replace(/^[\u4e00-\u9fff\s]+$/gm, '');
+  
+  // Remove lines with mixed Chinese and English contact details
+  cleanedText = cleanedText.replace(/^.*[\u4e00-\u9fff].*[A-Za-z].*$/gm, '');
+  
+  // Clean up multiple empty lines
+  cleanedText = cleanedText.replace(/\n\s*\n\s*\n/g, '\n\n');
+  
+  return cleanedText.trim();
 }

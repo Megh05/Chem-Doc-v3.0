@@ -14,6 +14,10 @@ import { storage } from "./storage";
 import { loadConfig, saveConfig, resetConfig } from "./config";
 import { insertTemplateSchema, insertDocumentSchema, insertProcessingJobSchema, insertSavedDocumentSchema } from "@shared/schema";
 import { processDocumentWithMistral, extractPlaceholdersFromTemplate, mapExtractedDataToTemplate } from "./lib/mistral";
+import { processMSDSDocument, mapMSDSSectionsToTemplate } from "./lib/msds-processor";
+import { normalizeMsdsSections } from "./lib/msds-normalize";
+import { generateDocx } from "./lib/docx-merge";
+import { SECTION_SLUGS, type SectionSlug } from "./lib/msds-slug-map";
 
 // XML escaping function to prevent corruption
 function escapeXml(text: string): string {
@@ -367,8 +371,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { documentId, templateId } = req.body;
       
+      // 🔍 AUDIT: Template ID Selection Tracking
+      console.log('🔍 AUDIT: Process Document Request Received');
+      console.log('📋 AUDIT: Document ID:', documentId);
+      console.log('🎯 AUDIT: Template ID Selected:', templateId);
+      console.log('🔍 AUDIT: Template ID Type:', typeof templateId);
+      
       const document = await storage.getDocument(documentId);
       const template = await storage.getTemplate(templateId);
+      
+      // 🔍 AUDIT: Template Validation
+      console.log('🔍 AUDIT: Template Found:', !!template);
+      if (template) {
+        console.log('📋 AUDIT: Template Name:', template.name);
+        console.log('📋 AUDIT: Template Type:', template.type);
+        console.log('📋 AUDIT: Template Field Mapping:', template.fieldMapping ? 'Present' : 'Missing');
+        if (template.fieldMapping) {
+          console.log('📋 AUDIT: Field Mapping Length:', template.fieldMapping.length);
+          console.log('📋 AUDIT: Field Mapping Preview:', template.fieldMapping.slice(0, 5));
+        }
+      }
       
       if (!document) {
         return res.status(404).json({ message: "Document not found" });
@@ -423,7 +445,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('🎯 Generated intelligent mapping:', mappingOrder);
       
-      // Store the intelligent mapping in the template for future use
+      // DISABLED: Store the intelligent mapping in the template for future use
+      // This was overriding our correct field mapping, causing blank documents
+      /*
       if (templateId && mappingOrder.length > 0) {
         try {
           console.log('💾 Attempting to store mapping in template:', templateId);
@@ -435,6 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         console.warn('⚠️ No templateId provided or empty mapping, cannot store');
       }
+      */
       
       res.json(mappingOrder);
     } catch (error: any) {
@@ -504,24 +529,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         intelligentMapping = (template as any).fieldMapping;
         console.log('🎯 Using stored intelligent field mapping:', intelligentMapping);
       } else {
-        // Fallback to generating new intelligent mapping
-        try {
-          const config = loadConfig();
-          intelligentMapping = await mapExtractedDataToTemplate(
-            documentData,
-            structure.html,
-            config.apiSettings.mistralApiKey || process.env.MISTRAL_API_KEY || ''
-          );
-          console.log('🎯 Generated new intelligent field mapping:', intelligentMapping);
+        // For MSDS documents, use the 16-key object directly (no conversion needed)
+        if (template.type === 'MSDS') {
+          // Use the 16-key object keys directly from the hard-reset pipeline
+          const TEMPLATE_KEYS = [
+            '1. Identification of the material and supplier:',
+            '2. Hazards Identification:',
+            '3. Composition/ Information on Ingredients:',
+            '4. First aid measures',
+            '5. Firefighting measures:',
+            '6. Accidental release measures:',
+            '7. Handling and storage:',
+            '8. Exposure controls Appropriate Engineering Controls:',
+            '9. Physical and Chemical Properties:',
+            '10. Stability and reactivity',
+            '11. Toxicological information',
+            '12. ECOLOGICAL INFORMATION:',
+            '13. Disposal considerations',
+            '14. Transport Information:',
+            '15. Regulatory Information:',
+            '16. Other Information:'
+          ];
+          intelligentMapping = TEMPLATE_KEYS;
+          console.log('🎯 Using 16-key object keys directly for MSDS:', intelligentMapping);
           
           // Store the new mapping for future use
           if (intelligentMapping.length > 0) {
             await storage.updateTemplate(template.id, { fieldMapping: intelligentMapping });
-            console.log('💾 Stored new field mapping in template');
+            console.log('💾 Stored MSDS 16-key mapping in template');
           }
-        } catch (mappingError) {
-          console.warn('⚠️ Failed to generate intelligent mapping, using fallback:', mappingError);
-          intelligentMapping = getFallbackMappingSimple(Object.keys(documentData));
+        } else {
+          // Fallback to generating new intelligent mapping for other document types
+          try {
+            const config = loadConfig();
+            intelligentMapping = await mapExtractedDataToTemplate(
+              documentData,
+              structure.html,
+              config.apiSettings.mistralApiKey || process.env.MISTRAL_API_KEY || ''
+            );
+            console.log('🎯 Generated new intelligent field mapping:', intelligentMapping);
+            
+            // Store the new mapping for future use
+            if (intelligentMapping.length > 0) {
+              await storage.updateTemplate(template.id, { fieldMapping: intelligentMapping });
+              console.log('💾 Stored new field mapping in template');
+            }
+          } catch (mappingError) {
+            console.warn('⚠️ Failed to generate intelligent mapping, using fallback:', mappingError);
+            intelligentMapping = getFallbackMappingSimple(Object.keys(documentData));
+          }
         }
       }
       
@@ -622,9 +678,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.send(Buffer.from(pdfBytes));
         
       } else if (format === 'docx') {
-        // Generate DOCX using the template-based approach with intelligent mapping
+        // New robust DOCX merge: prefer slug-based MSDS merge when template type is MSDS
+        if (template.type === 'MSDS') {
+          // Ensure we have structured JSON with 16 canonical titles; normalize to slugs
+          const json16: Record<string, string> = (job.structuredJSON as any) || {};
+          const slugData = normalizeMsdsSections(json16);
+
+          // Write to a temp file and stream back
+          const outPath = path.join(uploadDir, `generated_${template.id}_${Date.now()}.docx`);
+          await generateDocx(templatePath, outPath, slugData, { failOnMissingRequired: true });
+          res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+          res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
+          return res.sendFile(path.resolve(outPath));
+        }
+
+        // Fallback for non-MSDS: keep existing placeholder replacement
         const filledDocxBuffer = await fillTemplateWithData(templatePath, documentData, intelligentMapping);
-        
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
         res.send(filledDocxBuffer);
@@ -730,7 +799,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Add dynamic title based on template type
         const documentTitle = template.type === 'TDS' ? 'TECHNICAL DATA SHEET' : 
-                             template.type === 'MDMS' ? 'MATERIAL DATA MANAGEMENT SHEET' : 
+                             template.type === 'MSDS' ? 'MATERIAL SAFETY DATA SHEET' : 
                              'CERTIFICATE OF ANALYSIS';
         const title = docx.createP();
         title.addText(documentTitle, { font_face: 'Arial', font_size: 16, bold: true });
@@ -796,6 +865,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error(`❌ Failed to delete processing job ${id}:`, error);
       res.status(500).json({ message: "Failed to delete processing job", error: error.message });
+    }
+  });
+
+  // OCR text download endpoint
+  app.get("/api/processing-jobs/:id/ocr-text", async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`📄 Downloading OCR text for processing job: ${id}`);
+      
+      const job = await storage.getProcessingJob(id);
+      if (!job) {
+        return res.status(404).json({ message: "Processing job not found" });
+      }
+      
+      // Use rawOcrText if available, otherwise fall back to ocrText for backward compatibility
+      const ocrTextToDownload = job.rawOcrText || job.ocrText;
+      if (!ocrTextToDownload) {
+        return res.status(404).json({ message: "OCR text not available for this job" });
+      }
+      
+      // Get the document to include filename in the download
+      const document = await storage.getDocument(job.documentId);
+      const originalFileName = document ? path.basename(document.fileName, path.extname(document.fileName)) : 'document';
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${originalFileName}_ocr_text.txt"`);
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      // Send the OCR text (raw if available, otherwise processed)
+      res.send(ocrTextToDownload);
+      
+      console.log(`✅ OCR text downloaded successfully for job: ${id}`);
+    } catch (error: any) {
+      console.error(`❌ Failed to download OCR text for job ${req.params.id}:`, error);
+      res.status(500).json({ message: "Failed to download OCR text", error: error.message });
+    }
+  });
+
+  // JSON download endpoint for structured MSDS data
+  app.get("/api/processing-jobs/:id/json", async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`📄 Downloading JSON data for processing job: ${id}`);
+      
+      const job = await storage.getProcessingJob(id);
+      if (!job) {
+        return res.status(404).json({ message: "Processing job not found" });
+      }
+      
+      // Check if structuredJSON is available
+      if (!job.structuredJSON) {
+        return res.status(404).json({ message: "Structured JSON data not available for this job" });
+      }
+      
+      // Get the document to include filename in the download
+      const document = await storage.getDocument(job.documentId);
+      const originalFileName = document ? path.basename(document.fileName, path.extname(document.fileName)) : 'document';
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${originalFileName}_structured_data.json"`);
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      // Send the structured JSON data
+      res.json(job.structuredJSON);
+      
+      console.log(`✅ JSON data downloaded successfully for job: ${id}`);
+    } catch (error: any) {
+      console.error(`❌ Failed to download JSON data for job ${req.params.id}:`, error);
+      res.status(500).json({ message: "Failed to download JSON data", error: error.message });
     }
   });
 
@@ -1043,8 +1183,49 @@ async function processDocumentInBackground(jobId: string) {
     
     console.log('📋 Using template HTML for extraction:', templateHtml?.substring(0, 200) + '...');
     
-    // Process with Mistral AI using template-guided extraction 
-    const result = await processDocumentWithMistral(document.filePath, templateHtml || '');
+    // CRITICAL: Check document category for MSDS processing
+    const documentCategory = template.type?.toUpperCase();
+    console.log('🔍 Document category detected:', documentCategory);
+    console.log('🔍 Template type:', template.type);
+    console.log('🔍 Template name:', template.name);
+    
+    let result: any;
+    
+    // MSDS-specific processing (ONLY for MSDS documents)
+    if (documentCategory === 'MSDS') {
+      console.log('📋 MSDS Processing: Starting MSDS-specific processing...');
+      console.log('🔍 About to call processMSDSDocument with:', { filePath: document.filePath, documentCategory });
+      
+      const msdsResult = await processMSDSDocument(document.filePath, templateHtml, documentCategory);
+      console.log('🔍 MSDS Result:', msdsResult ? 'SUCCESS' : 'NULL/RETURNED');
+      
+      if (msdsResult) {
+        // Use the 16-key object directly from verbatim pipeline (no conversion needed)
+        const json16 = msdsResult.structuredJSON;
+        
+        result = {
+          extractedText: msdsResult.sections.map(s => s.content).join('\n\n'),
+          rawOcrText: msdsResult.rawOcrText, // Store raw OCR text
+          keyValuePairs: json16, // Use 16-key object directly
+          accuracy: 98, // High accuracy for MSDS processing
+          tokensExtracted: msdsResult.sections.reduce((total, s) => total + s.content.length, 0),
+          structuredJSON: json16 // Use 16-key object directly
+        };
+        
+        console.log('✅ MSDS Processing: Completed successfully');
+        console.log('📊 MSDS Processing Log:', msdsResult.processingLog);
+      } else {
+        // Fallback to standard processing if MSDS processing returns null
+        console.log('⚠️ MSDS Processing: Fallback to standard processing - MSDS function returned null');
+        result = await processDocumentWithMistral(document.filePath, templateHtml || '');
+      }
+    } else {
+      // Standard processing for COA, TDS, and other document types
+      console.log('📋 Standard Processing: Using standard Mistral processing for', documentCategory || 'unknown document type');
+      result = await processDocumentWithMistral(document.filePath, templateHtml || '');
+      // For standard processing, the raw OCR text is the same as extracted text
+      result.rawOcrText = result.extractedText;
+    }
     
     const processingTime = Math.floor((Date.now() - startTime) / 1000);
     
@@ -1052,10 +1233,12 @@ async function processDocumentInBackground(jobId: string) {
     await storage.updateProcessingJob(jobId, {
       status: 'completed',
       ocrText: result.extractedText,
+      rawOcrText: result.rawOcrText,
       extractedData: result.keyValuePairs,
       accuracy: result.accuracy,
       tokensExtracted: result.tokensExtracted,
-      processingTime
+      processingTime,
+      structuredJSON: result.structuredJSON // Add structured JSON to the stored job
     });
     
   } catch (error: any) {

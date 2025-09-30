@@ -19,6 +19,9 @@ export interface AppConfig {
     processingFailed: boolean;
     weeklyReports: boolean;
   };
+  featureFlags: {
+    msdsParserV2: boolean;
+  };
 }
 
 const defaultConfig: AppConfig = {
@@ -38,6 +41,9 @@ const defaultConfig: AppConfig = {
     processingComplete: true,
     processingFailed: true,
     weeklyReports: false
+  },
+  featureFlags: {
+    msdsParserV2: process.env.MSDS_PARSER_V2 === '1'
   }
 };
 
@@ -54,7 +60,8 @@ export function loadConfig(): AppConfig {
         ...config,
         apiSettings: { ...defaultConfig.apiSettings, ...config.apiSettings },
         processingSettings: { ...defaultConfig.processingSettings, ...config.processingSettings },
-        notificationSettings: { ...defaultConfig.notificationSettings, ...config.notificationSettings }
+        notificationSettings: { ...defaultConfig.notificationSettings, ...config.notificationSettings },
+        featureFlags: { ...defaultConfig.featureFlags, ...config.featureFlags }
       };
     }
   } catch (error) {
@@ -85,3 +92,9 @@ export function resetConfig(): AppConfig {
     throw new Error('Failed to reset configuration');
   }
 }
+
+/**
+ * Feature flag helper for MSDS Parser V2
+ * Returns true if MSDS_PARSER_V2 environment variable is set to '1'
+ */
+export const isParserV2 = (): boolean => process.env.MSDS_PARSER_V2 === '1';

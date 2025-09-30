@@ -2,7 +2,7 @@
 
 ## Overview
 
-ChemDoc AI is a sophisticated document processing application that automates the extraction and transformation of chemical data from supplier documents. The system uses AI-powered OCR and data extraction to convert supplier certificates of analysis (CoA), technical data sheets (TDS), and material data management sheets (MDMS) into standardized company formats. Built with React, Express, and Drizzle ORM, it provides a complete workflow from document upload through AI processing to final document generation.
+ChemDoc AI is a sophisticated document processing application that automates the extraction and transformation of chemical data from supplier documents. The system uses AI-powered OCR and data extraction to convert supplier certificates of analysis (CoA), technical data sheets (TDS), and material safety data sheets (MSDS) into standardized company formats. Built with React, Express, and Drizzle ORM, it provides a complete workflow from document upload through AI processing to final document generation.
 
 ## User Preferences
 

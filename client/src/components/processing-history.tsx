@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FileText, Download, Eye, Trash2 } from "lucide-react";
+import { FileText, Download, Eye, Trash2, FileText as TextFile, FileJson } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -67,6 +67,85 @@ export default function ProcessingHistory({ jobs, onRefresh }: ProcessingHistory
     if (window.confirm('Are you sure you want to delete this processing job? This action cannot be undone.')) {
       setDeletingJobId(jobId);
       deleteJobMutation.mutate(jobId);
+    }
+  };
+
+  const handleDownloadOCRText = async (jobId: string) => {
+    try {
+      const response = await fetch(`/api/processing-jobs/${jobId}/ocr-text`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to download OCR text');
+      }
+      
+      // Get the filename from the Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename = contentDisposition 
+        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') 
+        : `job_${jobId}_ocr_text.txt`;
+      
+      // Create blob and download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: "OCR text downloaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to download OCR text",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadJSON = async (jobId: string) => {
+    try {
+      const response = await fetch(`/api/processing-jobs/${jobId}/json`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to download JSON data');
+      }
+      
+      // Get the filename from the Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename = contentDisposition 
+        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') 
+        : `job_${jobId}_structured_data.json`;
+      
+      // Create blob and download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: "JSON data downloaded successfully",
+      });
+    } catch (error: any) {
+      console.error('Error downloading JSON data:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to download JSON data",
+        variant: "destructive",
+      });
     }
   };
 
@@ -178,13 +257,37 @@ export default function ProcessingHistory({ jobs, onRefresh }: ProcessingHistory
                       disabled={job.status !== 'completed'}
                       data-testid={`button-download-${job.id}`}
                     >
+                      <Download className="w-4 h-4 mr-1" />
                       Download
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownloadOCRText(job.id)}
+                      disabled={job.status !== 'completed' || (!job.rawOcrText && !job.ocrText)}
+                      title="Download raw OCR text"
+                      data-testid={`button-download-ocr-${job.id}`}
+                    >
+                      <TextFile className="w-4 h-4 mr-1" />
+                      OCR Text
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownloadJSON(job.id)}
+                      disabled={job.status !== 'completed' || !job.structuredJSON}
+                      title="Download structured JSON data"
+                      data-testid={`button-download-json-${job.id}`}
+                    >
+                      <FileJson className="w-4 h-4 mr-1" />
+                      JSON
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       data-testid={`button-view-${job.id}`}
                     >
+                      <Eye className="w-4 h-4 mr-1" />
                       View
                     </Button>
                     <Button

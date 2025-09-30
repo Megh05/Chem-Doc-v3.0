@@ -14,7 +14,7 @@ export default function Templates() {
   const [showUpload, setShowUpload] = useState(false);
   const [uploadData, setUploadData] = useState({
     name: "",
-    type: "CoA" as "CoA" | "TDS" | "MDMS"
+    type: "CoA" as "CoA" | "TDS" | "MSDS"
   });
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -161,7 +161,7 @@ export default function Templates() {
                   >
                     <option value="CoA">Certificate of Analysis (CoA)</option>
                     <option value="TDS">Technical Data Sheet (TDS)</option>
-                    <option value="MDMS">Material Data Management Sheet (MDMS)</option>
+                    <option value="MSDS">Material Safety Data Sheet (MSDS)</option>
                   </select>
                 </div>
               </div>

@@ -1,0 +1,70 @@
+{
+  "version": "1.0.0",
+  "description": "Known header/footer patterns for MSDS document cleanup",
+  "patterns": {
+    "pageNumbers": [
+      "^Page\\s+\\d+\\s+of\\s+\\d+$",
+      "^Page\\s+\\d+$",
+      "^\\d+\\s*$",
+      "^-\\s*\\d+\\s*-$",
+      "^\\d+\\s*\\/\\s*\\d+$"
+    ],
+    "documentTitles": [
+      "^Material\\s+Safety\\s+Data\\s+Sheet$",
+      "^Safety\\s+Data\\s+Sheet$",
+      "^MSDS$",
+      "^SDS$",
+      "^Product\\s+Information\\s+Sheet$"
+    ],
+    "companyInfo": [
+      "^©\\s*\\d{4}",
+      "^Copyright\\s+\\d{4}",
+      "^Confidential$",
+      "^Proprietary$",
+      "^All\\s+Rights\\s+Reserved$",
+      "^Internal\\s+Use\\s+Only$"
+    ],
+    "addresses": [
+      "^\\d+\\s+[A-Za-z\\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Lane|Ln|Way|Circle|Cir|Court|Ct)",
+      "^[A-Za-z\\s]+,\\s*[A-Z]{2}\\s+\\d{5}(?:-\\d{4})?$",
+      "^[A-Za-z\\s]+,\\s*[A-Za-z\\s]+,\\s*\\d{5}(?:-\\d{4})?$",
+      "^Tel[ephone]*:\\s*[\\d\\-\\+\\(\\)\\s]+$",
+      "^Fax:\\s*[\\d\\-\\+\\(\\)\\s]+$",
+      "^Email:\\s*[\\w\\.-]+@[\\w\\.-]+\\.\\w+$",
+      "^Web[site]*:\\s*https?:\\/\\/[\\w\\.-]+"
+    ],
+    "disclaimers": [
+      "^This\\s+information\\s+is\\s+believed\\s+to\\s+be\\s+accurate",
+      "^The\\s+information\\s+contained\\s+herein",
+      "^No\\s+warranty\\s+is\\s+made",
+      "^Use\\s+at\\s+your\\s+own\\s+risk",
+      "^For\\s+professional\\s+use\\s+only"
+    ],
+    "separators": [
+      "^[-=_]{3,}$",
+      "^[•\\*\\-]{3,}$",
+      "^[#]{3,}$",
+      "^[~]{3,}$"
+    ],
+    "allCaps": [
+      "^[A-Z\\s]{10,}$"
+    ]
+  },
+  "thresholds": {
+    "minRepeatRatio": 0.6,
+    "minFingerprintLength": 18,
+    "maxRemovalRatio": 0.30
+  },
+  "materialFactPatterns": [
+    "\\bCAS\\s*No?\\.?\\s*\\d{2,7}-\\d{2}-\\d\\b",
+    "\\bUN\\s*\\d{3,5}\\b",
+    "\\bpH\\b\\s*[:=]?\\s*\\d",
+    "\\d+\\s*°\\s*C\\b",
+    "\\bEINECS\\b|\\bEC\\b\\s*\\d+"
+  ]
+}
+
+
+
+
+

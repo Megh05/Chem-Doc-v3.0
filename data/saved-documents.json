@@ -46,5 +46,31 @@
       "yeast_and_molds": "<10cfu/g"
     },
     "createdAt": "2025-08-29T07:25:44.824Z"
+  },
+  {
+    "id": "02661c98-90ac-42cb-a2e5-928d23c9e903",
+    "name": "MSDS TEMP - 15/9/2025",
+    "templateId": "f54caa8a-7cd1-41b3-8ecf-c8b7dc7cd33d",
+    "originalDocumentId": "4704e22d-53a1-4dfb-a2e8-d37e5f439688",
+    "finalData": {
+      "msds_s1": "Here is the cleaned document with headers and footers removed:",
+      "msds_s2": "Synonyms: Poly( β-glucuronic acid-[1 → 3]-β-N-acetylglucosamine-[1 → 4] ), alternating Formula (C_14 H_20 NNaO_11)_n",
+      "msds_s3": "",
+      "msds_s4": "To the best of our knowledge, this chemical, physical and toxic nature has not been fully investigated.",
+      "msds_s5": "Details of the supplier of the safety data sheet",
+      "msds_s6": "Main symptoms and effects, acute and delayed effects",
+      "msds_s7": "Speed Rail,Qufu,Jining,Shandong,China 4000905566 +865373195599",
+      "msds_s8": "| Component | Concentration | | :-- | :-- | | Sodium Hyaluronate | ≥ 95 \\% | | CAS-No. | 9067-32-7 | | EINECS-No. | 618-620-0 |",
+      "msds_s9": "Not a hazardous substance or mixture according to Regulation (EC) No. 1272/2008 [EU-GHS/CLP]. This substance is not classified as dangerous according to Directive 67/548/EEC.",
+      "msds_s10": "",
+      "msds_s11": "GHS label elements, including precautionary statements",
+      "msds_s12": "Instructions and instructions for timely medical treatment and special treatment required no data available",
+      "msds_s13": "Pictogram (s) : No symbol Signal word:No signal word Hazard statement(s):none Precautionary statement(s) Prevention:none Response:none Storage:none Disposal:none",
+      "msds_s14": "If inhaled: If breathed in, move person into fresh air. If not breathing, give artificial respiration. In case of skin contact: Wash off with soap and plenty of water. Consult a physician. In case of eye contact: Rinse thoroughly with plenty of water for at least 15 minutes and consult a physician. If swallowed: Never give anything by mouth to an unconscious person. Rinse mouth with water.Consult a physician.",
+      "msds_s15": "",
+      "msds_s16": "Use water spray, alcohol-resistant foam, dry chemical or carbon dioxide.",
+      "msds_product_name": "Product name"
+    },
+    "createdAt": "2025-09-15T12:15:27.257Z"
   }
 ]

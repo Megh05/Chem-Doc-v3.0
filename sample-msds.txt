@@ -1,0 +1,97 @@
+Material Safety Data Sheet
+
+Section 1 - Identification of the material and supplier
+Product name: Chemical ABC
+Manufacturer: Test Company Ltd.
+Address: 123 Test Street, Test City, TC 12345
+Telephone: +1-555-0123
+Fax: +1-555-0124
+Email: info@testcompany.com
+Emergency phone: +1-555-0125
+
+Section 2 - Hazards Identification
+Signal word: Warning
+Hazard statements: H315, H319
+Pictogram: GHS07
+Precautionary statements: P264, P280, P305+P351+P338
+
+Section 3 - Composition/Information on Ingredients
+CAS No: 123-45-6
+Concentration: 95%
+Synonyms: Test Chemical ABC
+EINECS No: 123-456-7
+
+Section 4 - First aid measures
+If inhaled: Move to fresh air
+In case of skin contact: Wash with soap and water
+In case of eye contact: Rinse with water for 15 minutes
+If swallowed: Do not induce vomiting
+
+Section 5 - Firefighting measures
+Suitable extinguishing media: Water spray, foam, dry chemical
+Special hazards: None known
+Protective equipment: Self-contained breathing apparatus
+
+Section 6 - Accidental release measures
+Personal precautions: Wear protective equipment
+Environmental precautions: Prevent entry into waterways
+Cleanup methods: Absorb with inert material
+
+Section 7 - Handling and storage
+Handling: Use in well-ventilated area
+Storage: Store in cool, dry place
+Incompatible materials: Strong oxidizers
+
+Section 8 - Exposure controls/Personal protection
+Engineering controls: Local exhaust ventilation
+Personal protective equipment: Safety glasses, gloves
+Exposure limits: TWA 10 mg/m³
+
+Section 9 - Physical and Chemical Properties
+Appearance: White powder
+Odor: Odorless
+pH: 6.5-7.5
+Melting point: 150-160°C
+Boiling point: Not applicable
+Solubility: Soluble in water
+
+Section 10 - Stability and reactivity
+Chemical stability: Stable under normal conditions
+Reactivity: None known
+Conditions to avoid: Heat, open flames
+Incompatible materials: Strong acids, strong bases
+
+Section 11 - Toxicological information
+Acute toxicity: LD50 > 2000 mg/kg (oral, rat)
+Skin irritation: Not irritating
+Eye irritation: Not irritating
+Sensitization: Not sensitizing
+
+Section 12 - Ecological information
+Aquatic toxicity: LC50 > 100 mg/L (fish, 96h)
+Persistence: Not readily biodegradable
+Bioaccumulation: Low bioaccumulation potential
+
+Section 13 - Disposal considerations
+Waste disposal: Dispose in accordance with local regulations
+Unused product: Return to supplier or dispose as hazardous waste
+Contaminated packaging: Dispose as hazardous waste
+
+Section 14 - Transport Information
+UN number: Not regulated
+Proper shipping name: Not applicable
+Transport hazard class: Not applicable
+Packing group: Not applicable
+
+Section 15 - Regulatory Information
+TSCA: Listed
+REACH: Registered
+DSL: Listed
+Other regulations: Not applicable
+
+Section 16 - Other Information
+Date of preparation: 2024-01-01
+Date of revision: 2024-01-01
+Version: 1.0
+Prepared by: Safety Department
+

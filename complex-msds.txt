@@ -1,0 +1,146 @@
+MATERIAL SAFETY DATA SHEET
+Cayman Chemical Company
+
+* 1 Identification of the substance/mixture and of the company/undertaking
+Product identifier: HTS 01037
+Trade name: HTS 01037
+CAS No: 682741-29-3
+EINECS No: Not available
+
+Company identification:
+Cayman Chemical Company
+1180 E. Ellsworth Rd.
+Ann Arbor, MI 48108
+Tel: 734-971-3335
+Fax: 734-971-3640
+Emergency telephone number: 734-971-3335
+
+2 Hazards identification
+Classification of the substance or mixture:
+Not classified as hazardous according to Regulation (EC) No 1272/2008.
+
+Label elements:
+Not applicable.
+
+Other hazards:
+Not applicable.
+
+3) Composition/information on ingredients
+Chemical name: HTS 01037
+CAS No: 682741-29-3
+Concentration: Not available
+
+4 First aid measures
+Description of necessary measures:
+If inhaled: Move to fresh air and keep at rest.
+In case of skin contact: Wash off with soap and plenty of water.
+In case of eye contact: Rinse thoroughly with plenty of water for at least 15 minutes.
+If swallowed: Do not induce vomiting. Rinse mouth with water.
+
+5 FIREFIGHTING MEASURES
+Suitable extinguishing media:
+Use water spray, alcohol-resistant foam, dry chemical or carbon dioxide.
+
+Special hazards arising from the substance or mixture:
+Combustion forms carbon oxides, namely carbon dioxide and carbon monoxide.
+
+Special protective equipment for fire-fighters:
+Wear self contained breathing apparatus for fire fighting if necessary.
+
+6 Accidental release measures
+Personal precautions, protective equipment and emergency procedures:
+No special measures required.
+
+Environmental precautions:
+No special measures required.
+
+Methods and material for containment and cleaning up:
+Sweep up and shovel into suitable containers for disposal.
+
+7 Handling and storage
+Precautions for safe handling:
+Handle in accordance with good industrial hygiene and safety practice.
+
+Conditions for safe storage:
+Store in cool place. Keep container tightly closed.
+
+8 EXPOSURE CONTROLS/PERSONAL PROTECTION
+Control parameters:
+No data available.
+
+Appropriate engineering controls:
+No further data; see section 7.
+
+Personal protective equipment:
+General protective and hygienic measures: The usual precautionary measures for handling chemicals should be followed.
+Breathing equipment: Not required.
+Protection of hands: The glove material has to be impermeable and resistant to the product.
+Eye protection: Not required.
+
+9 Physical and chemical properties
+Information on basic physical and chemical properties:
+Physical state: Solid
+Color: Not determined
+Odor: Characteristic
+Molecular Weight: Not available
+
+pH: Not available
+Melting point/Freezing point: Not available
+Boiling point/Boiling range: Not available
+Flash point: Not available
+Evaporation rate: Not available
+Flammability (solid, gas): Product is not flammable
+Upper/lower flammability or explosive limits: Not applicable
+Vapor pressure: Not applicable
+Vapor density: Not applicable
+Relative density: Not available
+Solubility: DMF: 3 mg/ml; DMSO: 5 mg/ml
+
+10 STABILITY AND REACTIVITY
+Reactivity: No further relevant information available.
+Chemical stability: No decomposition if used according to specifications.
+Possibility of hazardous reactions: No dangerous reactions known.
+Conditions to avoid: No further relevant information available.
+Incompatible materials: strong oxidizing agents, strong reducing agents, strong bases, strong acids
+Hazardous decomposition products: No dangerous decomposition products known.
+
+11 Toxicological information
+Information on toxicological effects:
+Acute toxicity: Primary irritant effect: on the skin: No irritant effect. on the eye: No irritating effect.
+Sensitization: No sensitizing effects known.
+Additional toxicological information: When used and handled according to specifications, the product does not have any harmful effects according to our experience and the information provided to us.
+Carcinogenic categories: Substance is not listed.
+
+12 Ecological information
+Toxicity: Aquatic toxicity: No further relevant information available.
+Persistence and degradability: No further relevant information available.
+Bioaccumulative potential: No further relevant information available.
+Mobility in soil: No further relevant information available.
+Other adverse effects: Water hazard class 1 (Self-assessment): slightly hazardous for water
+
+13 Disposal considerations
+Waste treatment methods: Recommendation: Smaller quantities can be disposed of with household waste.
+Uncleaned packagings: Recommendation: Disposal must be made according to official regulations.
+
+14 Transport information
+UN-Number: not regulated
+Proper shipping name: not regulated
+Transport hazard class(es): not regulated
+Packing group: not regulated
+Environmental hazards: Not applicable.
+
+15 Regulatory information
+Safety, health and environmental regulations/legislation specific for the substance or mixture: No further relevant information available.
+Sara Section 355: Substance is not listed.
+TSCA: Substance is not listed.
+Other regulations: Not applicable.
+
+16 OTHER INFORMATION
+All chemicals may pose unknown hazards and should be used with caution.
+Date of issue: 06/19/2025
+Date of revision: 06/19/2025
+Prepared by: Environment protection department
+
+
+
+

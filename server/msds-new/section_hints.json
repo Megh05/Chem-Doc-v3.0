@@ -1,0 +1,8 @@
+{
+  "s01_identification": { "keys": ["product", "identifier", "manufacturer", "supplier", "address", "tel", "fax", "email", "emergency"] },
+  "s02_hazards":       { "keys": ["ghs", "signal word", "pictogram", "hazard statements", "precautionary", "classification"] },
+  "s03_composition":   { "keys": ["cas", "einecs", "ec", "synonym", "%", "composition", "ingredient"] },
+  "s08_exposure_ppe":  { "keys": ["exposure limit", "ppe", "respiratory", "eye/face", "skin protection", "gloves"] },
+  "s09_physchem":      { "keys": ["appearance", "hygroscopic", "ph", "°c", "solubility", "mw", "density"] },
+  "s14_transport":     { "keys": ["un", "adr", "rid", "imdg", "iata", "not dangerous goods"] }
+}

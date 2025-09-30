@@ -34,7 +34,8 @@ export interface ProcessingJob {
   documentId: string;
   templateId: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
-  ocrText?: string | null;
+  ocrText?: string | null; // Processed/extracted text
+  rawOcrText?: string | null; // Raw OCR output from Mistral AI
   extractedData?: Record<string, any> | null; // key-value pairs
   accuracy?: number | null; // percentage
   tokensExtracted?: number | null;
@@ -81,6 +82,7 @@ export const insertProcessingJobSchema = z.object({
   templateId: z.string(),
   status: z.enum(['pending', 'processing', 'completed', 'failed']).optional(),
   ocrText: z.string().nullable().optional(),
+  rawOcrText: z.string().nullable().optional(),
   extractedData: z.record(z.any()).nullable().optional(),
   accuracy: z.number().nullable().optional(),
   tokensExtracted: z.number().nullable().optional(),
