@@ -15,6 +15,9 @@ import { loadConfig, saveConfig, resetConfig } from "./config";
 import { insertTemplateSchema, insertDocumentSchema, insertProcessingJobSchema, insertSavedDocumentSchema } from "@shared/schema";
 import { processDocumentWithMistral, extractPlaceholdersFromTemplate, mapExtractedDataToTemplate } from "./lib/mistral";
 import { processMSDSDocument, mapMSDSSectionsToTemplate } from "./lib/msds-processor";
+import { normalizeMsdsSections } from "./lib/msds-normalize";
+import { generateDocx } from "./lib/docx-merge";
+import { SECTION_SLUGS, type SectionSlug } from "./lib/msds-slug-map";
 
 // XML escaping function to prevent corruption
 function escapeXml(text: string): string {
@@ -675,9 +678,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.send(Buffer.from(pdfBytes));
         
       } else if (format === 'docx') {
-        // Generate DOCX using the template-based approach with intelligent mapping
+        // New robust DOCX merge: prefer slug-based MSDS merge when template type is MSDS
+        if (template.type === 'MSDS') {
+          // Ensure we have structured JSON with 16 canonical titles; normalize to slugs
+          const json16: Record<string, string> = (job.structuredJSON as any) || {};
+          const slugData = normalizeMsdsSections(json16);
+
+          // Write to a temp file and stream back
+          const outPath = path.join(uploadDir, `generated_${template.id}_${Date.now()}.docx`);
+          await generateDocx(templatePath, outPath, slugData, { failOnMissingRequired: true });
+          res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+          res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
+          return res.sendFile(path.resolve(outPath));
+        }
+
+        // Fallback for non-MSDS: keep existing placeholder replacement
         const filledDocxBuffer = await fillTemplateWithData(templatePath, documentData, intelligentMapping);
-        
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
         res.send(filledDocxBuffer);
