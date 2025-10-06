@@ -1000,10 +1000,19 @@ async function fillTemplateWithData(templatePath: string, extractedData: Record<
     // First, replace named placeholders for better accuracy
     Object.keys(extractedData).forEach(key => {
       const value = escapeXml(extractedData[key]?.toString() || '');
-      const namedPlaceholder = `{${key}}`;
-      if (modifiedXml.includes(namedPlaceholder)) {
-        modifiedXml = modifiedXml.replace(new RegExp(namedPlaceholder, 'g'), value);
-        console.log(`  ✅ DOCX: Replaced {${key}} with value`);
+      
+      // Try double-brace format first {{key}}
+      const doubleBracePlaceholder = `{{${key}}}`;
+      if (modifiedXml.includes(doubleBracePlaceholder)) {
+        modifiedXml = modifiedXml.replace(new RegExp(doubleBracePlaceholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+        console.log(`  ✅ DOCX: Replaced {{${key}}} with value (${value.substring(0, 50)}...)`);
+      }
+      
+      // Also try single-brace format {key}
+      const singleBracePlaceholder = `{${key}}`;
+      if (modifiedXml.includes(singleBracePlaceholder)) {
+        modifiedXml = modifiedXml.replace(new RegExp(singleBracePlaceholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+        console.log(`  ✅ DOCX: Replaced {${key}} with value (${value.substring(0, 50)}...)`);
       }
     });
     
