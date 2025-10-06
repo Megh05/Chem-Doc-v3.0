@@ -689,6 +689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // New robust DOCX merge: prefer slug-based MSDS merge when template type is MSDS
         if (template.type === 'MSDS') {
           // Normalize the document data to slugs
+          const normalizedDocumentData = normalizeMsdsSections(documentData);
           console.log('🧹 Normalized document data:', normalizedDocumentData);
           
           console.log('🔍 Template analysis for document generation:');
