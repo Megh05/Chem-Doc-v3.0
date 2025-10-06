@@ -688,13 +688,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (format === 'docx') {
         // New robust DOCX merge: prefer slug-based MSDS merge when template type is MSDS
         if (template.type === 'MSDS') {
-          // Ensure we have structured JSON with 16 canonical titles; normalize to slugs
-          const json16: Record<string, string> = (job.structuredJSON as any) || {};
-          const slugData = normalizeMsdsSections(json16);
+          // Normalize the document data to slugs
+          console.log('🧹 Normalized document data:', normalizedDocumentData);
+          
+          console.log('🔍 Template analysis for document generation:');
+          console.log('  - Template ID:', template.id);
+          console.log('  - Template has fieldMapping:', !!template.fieldMapping);
+          console.log('  - Template fieldMapping length:', template.fieldMapping?.length);
+          console.log('  - Template fieldMapping:', template.fieldMapping);
+          
+          // Remap data from slugs to template placeholders using intelligent mapping
+          let remappedData: Record<string, any> = {};
+          
+          if (template.fieldMapping && Array.isArray(template.fieldMapping) && template.fieldMapping.length === 16) {
+            // Use the stored intelligent field mapping to remap slugs to template placeholders
+            console.log('🎯 Using stored intelligent field mapping:', template.fieldMapping);
+            
+            SECTION_SLUGS.forEach((slug, index) => {
+              const templatePlaceholder = template.fieldMapping[index];
+              const value = normalizedDocumentData[slug];
+              if (value) {
+                remappedData[templatePlaceholder] = value;
+              }
+            });
+          } else if (intelligentMapping && intelligentMapping.length > 0) {
+            // Use the runtime intelligent mapping
+            console.log('🎯 Using runtime intelligent mapping:', intelligentMapping);
+            
+            intelligentMapping.forEach((fieldName, index) => {
+              if (index < SECTION_SLUGS.length) {
+                const slug = SECTION_SLUGS[index];
+                const value = normalizedDocumentData[slug];
+                if (value) {
+                  remappedData[fieldName] = value;
+                }
+              }
+            });
+          } else {
+            // Fallback: use slugged data directly
+            console.log('⚠️ No intelligent mapping available, using slugged data');
+            remappedData = normalizedDocumentData;
+          }
+
+          console.log('🔧 Replacing placeholders with intelligent mapping...');
+          console.log('  - Remapped data keys:', Object.keys(remappedData));
 
           // Write to a temp file and stream back
           const outPath = path.join(uploadDir, `generated_${template.id}_${Date.now()}.docx`);
-          await generateDocx(templatePath, outPath, slugData, { failOnMissingRequired: true });
+          await generateDocx(templatePath, outPath, remappedData, { failOnMissingRequired: false });
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
           res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
           return res.sendFile(path.resolve(outPath));

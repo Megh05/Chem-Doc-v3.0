@@ -23,29 +23,38 @@ export type MergeOptions = {
 export async function generateDocx(
   templatePath: string,
   outPath: string,
-  data: Record<SectionSlug, string>,
+  data: Record<string, string>,
   opts: MergeOptions = {}
 ) {
   const { failOnMissingRequired = true, requiredSlugs = [...SECTION_SLUGS] } = opts;
 
   const placeholders = await extractTemplatePlaceholders(templatePath);
-  const dataSlugs = new Set(Object.keys(data));
+  const dataKeys = new Set(Object.keys(data));
 
-  const missingInTemplate = requiredSlugs.filter((s) => !placeholders.has(s));
-  const missingInData = requiredSlugs.filter((s) => !dataSlugs.has(s) || !data[s]?.trim());
-  const extraInTemplate = [...placeholders].filter(
-    (p) => !(SECTION_SLUGS as readonly string[]).includes(p)
-  );
+  // Only perform strict validation if failOnMissingRequired is true
+  if (failOnMissingRequired) {
+    const missingInTemplate = requiredSlugs.filter((s) => !placeholders.has(s));
+    const missingInData = requiredSlugs.filter((s) => !dataKeys.has(s) || !data[s]?.trim());
+    const extraInTemplate = [...placeholders].filter(
+      (p) => !(SECTION_SLUGS as readonly string[]).includes(p)
+    );
 
-  // Structured, high-signal logs for operators
-  console.table([
-    { check: "missingInTemplate", count: missingInTemplate.length, items: missingInTemplate.join(", ") || "-" },
-    { check: "missingInData", count: missingInData.length, items: missingInData.join(", ") || "-" },
-    { check: "extraInTemplate", count: extraInTemplate.length, items: extraInTemplate.join(", ") || "-" },
-  ]);
+    // Structured, high-signal logs for operators
+    console.table([
+      { check: "missingInTemplate", count: missingInTemplate.length, items: missingInTemplate.join(", ") || "-" },
+      { check: "missingInData", count: missingInData.length, items: missingInData.join(", ") || "-" },
+      { check: "extraInTemplate", count: extraInTemplate.length, items: extraInTemplate.join(", ") || "-" },
+    ]);
 
-  if (failOnMissingRequired && (missingInTemplate.length || missingInData.length)) {
-    throw new Error("Template/data mismatch. See table above.");
+    if (missingInTemplate.length || missingInData.length) {
+      throw new Error("Template/data mismatch. See table above.");
+    }
+  } else {
+    // In flexible mode, just log what we're working with
+    console.log('📋 Document generation summary:');
+    console.log(`  - Template placeholders: ${placeholders.size}`);
+    console.log(`  - Data keys provided: ${dataKeys.size}`);
+    console.log(`  - Data keys: ${Array.from(dataKeys).join(', ')}`);
   }
 
   const template = await fs.readFile(templatePath);
