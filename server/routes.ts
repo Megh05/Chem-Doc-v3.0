@@ -538,10 +538,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔧 rawDocumentData source:', data ? 'from request.body.data' : (job.extractedData ? 'from job.extractedData' : 'empty object'));
       console.log('🔧 rawDocumentData keys:', Object.keys(rawDocumentData).slice(0, 5));
       
-      // Normalize extracted data to clean field names
-      const documentData = normalizeExtractedData(rawDocumentData);
-      console.log('🧹 Normalized document data keys:', Object.keys(documentData).slice(0, 5));
-      console.log('🧹 Normalized document data sample:', JSON.stringify(documentData).substring(0, 300));
+      // For MSDS documents, skip the general normalization because normalizeMsdsSections will handle it
+      // For other documents, normalize to clean field names
+      const documentData = template.type === 'MSDS' ? rawDocumentData : normalizeExtractedData(rawDocumentData);
+      console.log('🧹 Document data keys:', Object.keys(documentData).slice(0, 5));
+      console.log('🧹 Document data sample:', JSON.stringify(documentData).substring(0, 300));
       
       // Get template structure for intelligent mapping
       const structure = await parseTemplateStructure(templatePath);
