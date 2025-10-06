@@ -58,10 +58,10 @@ export async function generateDocx(
 
   const template = await fs.readFile(templatePath);
   
-  const docxTemplates = await import('docx-templates');
-  const createReportFn = docxTemplates.default || docxTemplates;
+  // Import the createReport function using named import
+  const { createReport } = await import('docx-templates');
   
-  const report = await createReportFn({
+  const report = await createReport({
     template,
     data,
     cmdDelimiter: ["{{", "}}"],
