@@ -24,7 +24,25 @@
     ],
     "id": "11a3b0d1-ce4e-42de-a0ac-67df8dd1e4c5",
     "createdAt": "2025-10-06T14:49:19.090Z",
-    "updatedAt": "2025-10-06T14:50:16.831Z",
-    "html": "<h3>1.\tIdentification of the material and supplier:</h3><p>{{sec_01_identification}}<br /></p><h3>2.\tHazards Identification:</h3><p>{{sec_02_hazards}}</p><h3>3.\tComposition/ Information on Ingredients:</h3><p>{{sec_03_composition}}</p><h3>4.\tFirst aid measures</h3><p>{{sec_04_first_aid}}</p><h3>5.\tFirefighting measures:</h3><p>{{sec_05_fire_fighting}}</p><h3>6.\tAccidental release measures:</h3><p>{{sec_06_accidental_release}}</p><h3>7.\tHandling and storage:</h3><p>{{sec_07_handling_storage}}</p><h3>8.\tExposure controls Appropriate Engineering Controls:</h3><p>{{sec_08_exposure_ppe}}</p><h3>9.\tPhysical and Chemical Properties:</h3><p>{{sec_09_physical_chemical}}</p><h3>10.\tStability and reactivity</h3><p>{{sec_10_stability_reactivity}}</p><h3>11.\tToxicological information</h3><p>{{sec_11_toxicology}}</p><h3>12.\tECOLOGICAL INFORMATION:</h3><p>{{sec_12_ecology}}</p><h3>13.\tDisposal considerations</h3><p>{{sec_13_disposal}}</p><h3>14.\tTransport Information:</h3><p>{{sec_14_transport}}</p><h3>15.\tRegulatory Information:</h3><p>{{sec_15_regulatory}}</p><h3>16.\tOther Information:</h3><p>{{sec_16_other}}</p>"
+    "updatedAt": "2025-10-06T15:01:13.016Z",
+    "html": "<h3>1.\tIdentification of the material and supplier:</h3><p>{{sec_01_identification}}<br /></p><h3>2.\tHazards Identification:</h3><p>{{sec_02_hazards}}</p><h3>3.\tComposition/ Information on Ingredients:</h3><p>{{sec_03_composition}}</p><h3>4.\tFirst aid measures</h3><p>{{sec_04_first_aid}}</p><h3>5.\tFirefighting measures:</h3><p>{{sec_05_fire_fighting}}</p><h3>6.\tAccidental release measures:</h3><p>{{sec_06_accidental_release}}</p><h3>7.\tHandling and storage:</h3><p>{{sec_07_handling_storage}}</p><h3>8.\tExposure controls Appropriate Engineering Controls:</h3><p>{{sec_08_exposure_ppe}}</p><h3>9.\tPhysical and Chemical Properties:</h3><p>{{sec_09_physical_chemical}}</p><h3>10.\tStability and reactivity</h3><p>{{sec_10_stability_reactivity}}</p><h3>11.\tToxicological information</h3><p>{{sec_11_toxicology}}</p><h3>12.\tECOLOGICAL INFORMATION:</h3><p>{{sec_12_ecology}}</p><h3>13.\tDisposal considerations</h3><p>{{sec_13_disposal}}</p><h3>14.\tTransport Information:</h3><p>{{sec_14_transport}}</p><h3>15.\tRegulatory Information:</h3><p>{{sec_15_regulatory}}</p><h3>16.\tOther Information:</h3><p>{{sec_16_other}}</p>",
+    "fieldMapping": [
+      "1. Identification of the material and supplier:",
+      "2. Hazards Identification:",
+      "3. Composition/ Information on Ingredients:",
+      "4. First aid measures",
+      "5. Firefighting measures:",
+      "6. Accidental release measures:",
+      "7. Handling and storage:",
+      "8. Exposure controls Appropriate Engineering Controls:",
+      "9. Physical and Chemical Properties:",
+      "10. Stability and reactivity",
+      "11. Toxicological information",
+      "12. ECOLOGICAL INFORMATION:",
+      "13. Disposal considerations",
+      "14. Transport Information:",
+      "15. Regulatory Information:",
+      "16. Other Information:"
+    ]
   }
 ]

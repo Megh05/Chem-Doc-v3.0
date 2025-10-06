@@ -18,6 +18,7 @@ import { processMSDSDocument, mapMSDSSectionsToTemplate } from "./lib/msds-proce
 import { normalizeMsdsSections } from "./lib/msds-normalize";
 import { generateDocx } from "./lib/docx-merge";
 import { SECTION_SLUGS, type SectionSlug } from "./lib/msds-slug-map";
+import { titleToSlug } from "./lib/msds-title-normalizer";
 
 // XML escaping function to prevent corruption
 function escapeXml(text: string): string {
@@ -61,8 +62,15 @@ function normalizeExtractedData(rawData: Record<string, any>): Record<string, an
   const normalized: Record<string, any> = {};
   
   for (const [key, value] of Object.entries(rawData)) {
-    const cleanKey = normalizeFieldName(key);
-    normalized[cleanKey] = value;
+    // Try to convert to MSDS slug first (for MSDS sections)
+    const slug = titleToSlug(key);
+    if (slug) {
+      normalized[slug] = value;
+    } else {
+      // Fall back to regular field name normalization (for CoA/TDS fields)
+      const cleanKey = normalizeFieldName(key);
+      normalized[cleanKey] = value;
+    }
   }
   
   return normalized;
