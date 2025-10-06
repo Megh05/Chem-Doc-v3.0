@@ -1,12 +1,30 @@
 [
   {
-    "name": "MDMS",
+    "name": "MSDS",
     "type": "MSDS",
-    "fileName": "NTCB MSDS COSCARE-H ACID (1).docx",
-    "fileSize": 429081,
-    "placeholders": [],
-    "id": "96c927d6-788d-4278-8418-92fca22d23f5",
-    "createdAt": "2025-10-06T14:47:45.992Z",
-    "updatedAt": "2025-10-06T14:47:45.992Z"
+    "fileName": "MSDS Temp.docx",
+    "fileSize": 16791,
+    "placeholders": [
+      "material_identification_and_supplier_details",
+      "hazards_identification",
+      "composition_information_on_ingredients",
+      "first_aid_measures",
+      "firefighting_measures",
+      "accidental_release_measures",
+      "handling_and_storage_instructions",
+      "exposure_controls_and_ppe_requirements",
+      "physical_and_chemical_properties",
+      "stability_and_reactivity_data",
+      "toxicological_information",
+      "ecological_information",
+      "disposal_considerations",
+      "transport_information",
+      "regulatory_information",
+      "other_information"
+    ],
+    "id": "11a3b0d1-ce4e-42de-a0ac-67df8dd1e4c5",
+    "createdAt": "2025-10-06T14:49:19.090Z",
+    "updatedAt": "2025-10-06T14:50:16.831Z",
+    "html": "<h3>1.\tIdentification of the material and supplier:</h3><p>{{sec_01_identification}}<br /></p><h3>2.\tHazards Identification:</h3><p>{{sec_02_hazards}}</p><h3>3.\tComposition/ Information on Ingredients:</h3><p>{{sec_03_composition}}</p><h3>4.\tFirst aid measures</h3><p>{{sec_04_first_aid}}</p><h3>5.\tFirefighting measures:</h3><p>{{sec_05_fire_fighting}}</p><h3>6.\tAccidental release measures:</h3><p>{{sec_06_accidental_release}}</p><h3>7.\tHandling and storage:</h3><p>{{sec_07_handling_storage}}</p><h3>8.\tExposure controls Appropriate Engineering Controls:</h3><p>{{sec_08_exposure_ppe}}</p><h3>9.\tPhysical and Chemical Properties:</h3><p>{{sec_09_physical_chemical}}</p><h3>10.\tStability and reactivity</h3><p>{{sec_10_stability_reactivity}}</p><h3>11.\tToxicological information</h3><p>{{sec_11_toxicology}}</p><h3>12.\tECOLOGICAL INFORMATION:</h3><p>{{sec_12_ecology}}</p><h3>13.\tDisposal considerations</h3><p>{{sec_13_disposal}}</p><h3>14.\tTransport Information:</h3><p>{{sec_14_transport}}</p><h3>15.\tRegulatory Information:</h3><p>{{sec_15_regulatory}}</p><h3>16.\tOther Information:</h3><p>{{sec_16_other}}</p>"
   }
 ]

@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Template } from "@shared/schema";
+import { convertExtractedDataToSlugs } from "@/lib/slug-mapping";
 
 interface TemplatePreviewProps {
   template: Template;
@@ -112,13 +113,16 @@ export default function TemplatePreview({
       });
       
       // Also handle any named placeholders that might exist
+      // Convert extracted data keys to slugs for proper matching
+      const sluggedData = convertExtractedDataToSlugs(extractedData);
+      
       const allPlaceholders = new Set([
-        ...Object.keys(extractedData),
+        ...Object.keys(sluggedData),
         ...(template.placeholders || [])
       ]);
 
       allPlaceholders.forEach(key => {
-        const value = extractedData[key] || '';
+        const value = sluggedData[key] || '';
         const placeholderPatterns = [
           new RegExp(`\\{${key}\\}`, 'g'),
           new RegExp(`\\{\\{${key}\\}\\}`, 'g'),
