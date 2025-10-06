@@ -19,6 +19,7 @@ import { normalizeMsdsSections } from "./lib/msds-normalize";
 import { generateDocx } from "./lib/docx-merge";
 import { SECTION_SLUGS, type SectionSlug } from "./lib/msds-slug-map";
 import { titleToSlug } from "./lib/msds-title-normalizer";
+import { createSlugMappingFromFieldArray, remapDataUsingSlugMapping } from "./lib/slug-to-placeholder-mapper";
 
 // XML escaping function to prevent corruption
 function escapeXml(text: string): string {
@@ -690,49 +691,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (template.type === 'MSDS') {
           // Normalize the document data to slugs
           const normalizedDocumentData = normalizeMsdsSections(documentData);
-          console.log('🧹 Normalized document data:', normalizedDocumentData);
+          console.log('🧹 Normalized document data keys:', Object.keys(normalizedDocumentData));
           
           console.log('🔍 Template analysis for document generation:');
           console.log('  - Template ID:', template.id);
           console.log('  - Template has fieldMapping:', !!template.fieldMapping);
           console.log('  - Template fieldMapping length:', template.fieldMapping?.length);
-          console.log('  - Template fieldMapping:', template.fieldMapping);
           
-          // Remap data from slugs to template placeholders using intelligent mapping
+          // Create slug-to-placeholder mapping from stored fieldMapping
+          let slugMapping: Record<string, string> = {};
           let remappedData: Record<string, any> = {};
           
-          if (template.fieldMapping && Array.isArray(template.fieldMapping) && template.fieldMapping.length === 16) {
-            // Use the stored intelligent field mapping to remap slugs to template placeholders
-            console.log('🎯 Using stored intelligent field mapping:', template.fieldMapping);
+          if (template.fieldMapping && Array.isArray(template.fieldMapping) && template.fieldMapping.length > 0) {
+            // Convert the stored array-based field mapping to a slug-to-placeholder dictionary
+            console.log('🎯 Creating slug mapping from stored field mapping');
+            slugMapping = createSlugMappingFromFieldArray(template.fieldMapping);
             
-            SECTION_SLUGS.forEach((slug, index) => {
-              const templatePlaceholder = template.fieldMapping[index];
-              const value = normalizedDocumentData[slug];
-              if (value) {
-                remappedData[templatePlaceholder] = value;
-              }
-            });
+            // Remap the normalized data using the slug mapping
+            console.log('🔄 Remapping data from slugs to template placeholders...');
+            remappedData = remapDataUsingSlugMapping(normalizedDocumentData, slugMapping);
           } else if (intelligentMapping && intelligentMapping.length > 0) {
             // Use the runtime intelligent mapping
-            console.log('🎯 Using runtime intelligent mapping:', intelligentMapping);
-            
-            intelligentMapping.forEach((fieldName, index) => {
-              if (index < SECTION_SLUGS.length) {
-                const slug = SECTION_SLUGS[index];
-                const value = normalizedDocumentData[slug];
-                if (value) {
-                  remappedData[fieldName] = value;
-                }
-              }
-            });
+            console.log('🎯 Creating slug mapping from runtime intelligent mapping');
+            slugMapping = createSlugMappingFromFieldArray(intelligentMapping);
+            remappedData = remapDataUsingSlugMapping(normalizedDocumentData, slugMapping);
           } else {
             // Fallback: use slugged data directly
-            console.log('⚠️ No intelligent mapping available, using slugged data');
+            console.log('⚠️ No intelligent mapping available, using slugged data directly');
             remappedData = normalizedDocumentData;
           }
 
-          console.log('🔧 Replacing placeholders with intelligent mapping...');
-          console.log('  - Remapped data keys:', Object.keys(remappedData));
+          console.log('✅ Final remapped data keys:', Object.keys(remappedData));
+          console.log('📊 Data preview:', Object.keys(remappedData).slice(0, 3).map(k => `${k}: ${remappedData[k]?.substring(0, 50)}...`));
 
           // Write to a temp file and stream back
           const outPath = path.join(uploadDir, `generated_${template.id}_${Date.now()}.docx`);

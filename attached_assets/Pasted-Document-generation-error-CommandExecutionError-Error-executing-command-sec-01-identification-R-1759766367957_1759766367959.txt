@@ -1,0 +1,58 @@
+Document generation error: CommandExecutionError: Error executing command 'sec_01_identification': ReferenceError: sec_01_identification is not defined
+    at new CommandExecutionError (/home/runner/workspace/node_modules/docx-templates/lib/errors.js:78:28)
+    at /home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:112:32
+    at step (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:44:23)
+    at Object.next (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:25:53)
+    at /home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:19:71
+    at new Promise (<anonymous>)
+    at __awaiter (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:15:12)
+    at runUserJsAndGetRaw (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:64:12)
+    at /home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:609:73
+    at step (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:44:23)
+    at Object.next (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:25:53)
+    at /home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:19:71
+    at new Promise (<anonymous>)
+    at __awaiter (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:15:12)
+    at processCmd (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:565:54)
+    at /home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:531:38
+    at step (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:44:23)
+    at Object.next (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:25:53)
+    at /home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:19:71
+    at new Promise (<anonymous>)
+    at __awaiter (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:15:12)
+    at processText (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:500:66)
+    at /home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:433:42
+    at step (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:44:23)
+    at Object.next (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:25:53)
+    at fulfilled (/home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:16:58) {
+  command: 'sec_01_identification',
+  err: evalmachine.<anonymous>:1
+  sec_01_identification
+  ^
+  
+  ReferenceError: sec_01_identification is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:149:12)
+      at /home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:98:49
+      at step (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:44:23)
+      at Object.next (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:25:53)
+      at /home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:19:71
+      at new Promise (<anonymous>)
+      at __awaiter (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:15:12)
+      at runUserJsAndGetRaw (/home/runner/workspace/node_modules/docx-templates/lib/jsSandbox.js:64:12)
+      at /home/runner/workspace/node_modules/docx-templates/lib/processTemplate.js:609:73
+}
+3:58:52 PM [express] POST /api/generate-document/0612eaf1-1e1d-4c53-9a6f-224a0c040d2e 500 in 323ms :…
+3:58:55 PM [express] GET /api/processing-jobs 304 in 67ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:58:57 PM [express] GET /api/processing-jobs 304 in 60ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:58:58 PM [express] GET /api/processing-jobs 200 in 63ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:02 PM [express] GET /api/processing-jobs 304 in 55ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:04 PM [express] GET /api/processing-jobs 304 in 49ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:07 PM [express] GET /api/processing-jobs 304 in 60ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:09 PM [express] GET /api/processing-jobs 304 in 82ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:12 PM [express] GET /api/processing-jobs 304 in 57ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:14 PM [express] GET /api/processing-jobs 304 in 64ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:17 PM [express] GET /api/processing-jobs 304 in 67ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:19 PM [express] GET /api/processing-jobs 304 in 55ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:22 PM [express] GET /api/processing-jobs 304 in 60ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
+3:59:25 PM [express] GET /api/processing-jobs 304 in 65ms :: [{"documentId":"c5114da5-f3c8-4624-9d41…
