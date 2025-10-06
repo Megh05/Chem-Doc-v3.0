@@ -34,7 +34,7 @@ export async function generateDocx(
   if (failOnMissingRequired) {
     const missingInTemplate = requiredSlugs.filter((s) => !placeholders.has(s));
     const missingInData = requiredSlugs.filter((s) => !dataKeys.has(s) || !data[s]?.trim());
-    const extraInTemplate = [...placeholders].filter(
+    const extraInTemplate = Array.from(placeholders).filter(
       (p) => !(SECTION_SLUGS as readonly string[]).includes(p)
     );
 

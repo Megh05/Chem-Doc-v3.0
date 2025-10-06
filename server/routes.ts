@@ -16,10 +16,10 @@ import { insertTemplateSchema, insertDocumentSchema, insertProcessingJobSchema, 
 import { processDocumentWithMistral, extractPlaceholdersFromTemplate, mapExtractedDataToTemplate } from "./lib/mistral";
 import { processMSDSDocument, mapMSDSSectionsToTemplate } from "./lib/msds-processor";
 import { normalizeMsdsSections } from "./lib/msds-normalize";
-import { generateDocx } from "./lib/docx-merge";
+import { generateDocx, extractTemplatePlaceholders } from "./lib/docx-merge";
 import { SECTION_SLUGS, type SectionSlug } from "./lib/msds-slug-map";
 import { titleToSlug } from "./lib/msds-title-normalizer";
-import { createSlugMappingFromFieldArray, remapDataUsingSlugMapping } from "./lib/slug-to-placeholder-mapper";
+import { createSlugMappingFromFieldArray, remapDataUsingSlugMapping, createSlugToPlaceholderMapping } from "./lib/slug-to-placeholder-mapper";
 
 // XML escaping function to prevent corruption
 function escapeXml(text: string): string {
@@ -693,34 +693,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const normalizedDocumentData = normalizeMsdsSections(documentData);
           console.log('🧹 Normalized document data keys:', Object.keys(normalizedDocumentData));
           
-          console.log('🔍 Template analysis for document generation:');
-          console.log('  - Template ID:', template.id);
-          console.log('  - Template has fieldMapping:', !!template.fieldMapping);
-          console.log('  - Template fieldMapping length:', template.fieldMapping?.length);
+          // Extract ACTUAL placeholders from the DOCX template file
+          const actualPlaceholders = await extractTemplatePlaceholders(templatePath);
+          const placeholderArray = Array.from(actualPlaceholders);
+          console.log('📋 Actual placeholders in DOCX template:', placeholderArray);
           
-          // Create slug-to-placeholder mapping from stored fieldMapping
-          let slugMapping: Record<string, string> = {};
-          let remappedData: Record<string, any> = {};
+          // Create mapping from slugs to actual template placeholders
+          const slugToPlaceholder = createSlugToPlaceholderMapping(placeholderArray);
+          console.log('🔗 Slug to placeholder mapping:', slugToPlaceholder);
           
-          if (template.fieldMapping && Array.isArray(template.fieldMapping) && template.fieldMapping.length > 0) {
-            // Convert the stored array-based field mapping to a slug-to-placeholder dictionary
-            console.log('🎯 Creating slug mapping from stored field mapping');
-            slugMapping = createSlugMappingFromFieldArray(template.fieldMapping);
-            
-            // Remap the normalized data using the slug mapping
-            console.log('🔄 Remapping data from slugs to template placeholders...');
-            remappedData = remapDataUsingSlugMapping(normalizedDocumentData, slugMapping);
-          } else if (intelligentMapping && intelligentMapping.length > 0) {
-            // Use the runtime intelligent mapping
-            console.log('🎯 Creating slug mapping from runtime intelligent mapping');
-            slugMapping = createSlugMappingFromFieldArray(intelligentMapping);
-            remappedData = remapDataUsingSlugMapping(normalizedDocumentData, slugMapping);
-          } else {
-            // Fallback: use slugged data directly
-            console.log('⚠️ No intelligent mapping available, using slugged data directly');
-            remappedData = normalizedDocumentData;
-          }
-
+          // Remap the normalized data to use the actual template placeholders
+          const remappedData = remapDataUsingSlugMapping(normalizedDocumentData, slugToPlaceholder);
+          
           console.log('✅ Final remapped data keys:', Object.keys(remappedData));
           console.log('📊 Data preview:', Object.keys(remappedData).slice(0, 3).map(k => `${k}: ${remappedData[k]?.substring(0, 50)}...`));
 
