@@ -687,36 +687,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.send(Buffer.from(pdfBytes));
         
       } else if (format === 'docx') {
-        // New robust DOCX merge: prefer slug-based MSDS merge when template type is MSDS
-        if (template.type === 'MSDS') {
+        // For MSDS templates, normalize data and use field mapping
+        if (template.type === 'MSDS' && template.fieldMapping && template.fieldMapping.length > 0) {
           // Normalize the document data to slugs
           const normalizedDocumentData = normalizeMsdsSections(documentData);
           console.log('🧹 Normalized document data keys:', Object.keys(normalizedDocumentData));
           
-          // Extract ACTUAL placeholders from the DOCX template file
-          const actualPlaceholders = await extractTemplatePlaceholders(templatePath);
-          const placeholderArray = Array.from(actualPlaceholders);
-          console.log('📋 Actual placeholders in DOCX template:', placeholderArray);
+          // Map from slugs to original field names using the stored fieldMapping
+          const slugMapping = createSlugMappingFromFieldArray(template.fieldMapping);
+          const mappedData: Record<string, string> = {};
           
-          // Create mapping from slugs to actual template placeholders
-          const slugToPlaceholder = createSlugToPlaceholderMapping(placeholderArray);
-          console.log('🔗 Slug to placeholder mapping:', slugToPlaceholder);
+          // Remap using the field mapping
+          for (const [slug, value] of Object.entries(normalizedDocumentData)) {
+            const fieldName = slugMapping[slug];
+            if (fieldName) {
+              mappedData[fieldName] = value as string;
+              console.log(`  ✅ Mapped ${slug} → "${fieldName}"`);
+            } else {
+              console.log(`  ⚠️  No mapping for ${slug}`);
+            }
+          }
           
-          // Remap the normalized data to use the actual template placeholders
-          const remappedData = remapDataUsingSlugMapping(normalizedDocumentData, slugToPlaceholder);
+          console.log('✅ Final mapped data keys:', Object.keys(mappedData));
           
-          console.log('✅ Final remapped data keys:', Object.keys(remappedData));
-          console.log('📊 Data preview:', Object.keys(remappedData).slice(0, 3).map(k => `${k}: ${remappedData[k]?.substring(0, 50)}...`));
-
-          // Write to a temp file and stream back
-          const outPath = path.join(uploadDir, `generated_${template.id}_${Date.now()}.docx`);
-          await generateDocx(templatePath, outPath, remappedData, { failOnMissingRequired: false });
+          // Use the field mapping as intelligent mapping for fillTemplateWithData
+          const filledDocxBuffer = await fillTemplateWithData(templatePath, mappedData, template.fieldMapping);
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
           res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
-          return res.sendFile(path.resolve(outPath));
+          return res.send(filledDocxBuffer);
         }
 
-        // Fallback for non-MSDS: keep existing placeholder replacement
+        // Fallback for non-MSDS or templates without field mapping
         const filledDocxBuffer = await fillTemplateWithData(templatePath, documentData, intelligentMapping);
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
@@ -1008,7 +1009,8 @@ async function fillTemplateWithData(templatePath: string, extractedData: Record<
     // Replace placeholders in the XML
     let modifiedXml = documentXml;
     
-    console.log('🔧 DOCX: Replacing placeholders with intelligent mapping...');
+    console.log('🔧 DOCX: Filling template with data...');
+    console.log('🔧 Intelligent mapping provided:', !!intelligentMapping, intelligentMapping?.length || 0, 'fields');
     
     // First, replace named placeholders for better accuracy
     Object.keys(extractedData).forEach(key => {
@@ -1016,37 +1018,55 @@ async function fillTemplateWithData(templatePath: string, extractedData: Record<
       const namedPlaceholder = `{${key}}`;
       if (modifiedXml.includes(namedPlaceholder)) {
         modifiedXml = modifiedXml.replace(new RegExp(namedPlaceholder, 'g'), value);
-        console.log(`  ✅ DOCX: Replaced {${key}} with: ${value}`);
+        console.log(`  ✅ DOCX: Replaced {${key}} with value`);
       }
     });
     
     // Then handle any remaining {} placeholders with intelligent mapping
-    if (intelligentMapping) {
+    if (intelligentMapping && intelligentMapping.length > 0) {
       let placeholderIndex = 0;
       modifiedXml = modifiedXml.replace(/\{\}/g, () => {
         if (placeholderIndex < intelligentMapping!.length) {
           const fieldName = intelligentMapping![placeholderIndex];
           const value = extractedData[fieldName] || '';
           placeholderIndex++;
-          console.log(`  🔄 DOCX: Replaced placeholder ${placeholderIndex} with ${fieldName}: ${value}`);
+          console.log(`  🔄 DOCX: Replaced placeholder ${placeholderIndex} with "${fieldName}": ${value.toString().substring(0, 50)}...`);
           return escapeXml(value.toString());
         }
         console.log(`  ⚠️ DOCX: No more mapping for placeholder ${placeholderIndex + 1}`);
         return '';
       });
-    } else {
-      // Fallback: replace {} placeholders with data in field order
-      const fieldNames = Object.keys(extractedData);
-      let placeholderIndex = 0;
-      modifiedXml = modifiedXml.replace(/\{\}/g, () => {
-        if (placeholderIndex < fieldNames.length) {
-          const fieldName = fieldNames[placeholderIndex];
-          const value = extractedData[fieldName] || '';
-          placeholderIndex++;
-          console.log(`  🔄 DOCX: Fallback placeholder ${placeholderIndex} with ${fieldName}: ${value}`);
-          return escapeXml(value.toString());
+      console.log(`  ✅ Replaced ${placeholderIndex} placeholders total`);
+    }
+    
+    // If no {} placeholders were found but we have intelligent mapping,
+    // try to insert content after section headings
+    if (intelligentMapping && intelligentMapping.length > 0 && !modifiedXml.includes('{}')) {
+      console.log('🔧 No {} placeholders found, trying to insert content after section headings...');
+      
+      intelligentMapping.forEach((fieldName, index) => {
+        const value = extractedData[fieldName];
+        if (value) {
+          // Try to find the section heading and insert content after it
+          // Look for the heading text in the XML
+          const headingPattern = fieldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const headingMatch = modifiedXml.match(new RegExp(`<w:t[^>]*>${headingPattern}</w:t>`, 'i'));
+          
+          if (headingMatch) {
+            // Insert a new paragraph with the content after the heading
+            const contentXml = `<w:p><w:r><w:t xml:space="preserve">${escapeXml(value.toString())}</w:t></w:r></w:p>`;
+            const insertPosition = modifiedXml.indexOf(headingMatch[0]) + headingMatch[0].length;
+            
+            // Find the end of the current paragraph
+            const paragraphEnd = modifiedXml.indexOf('</w:p>', insertPosition);
+            if (paragraphEnd !== -1) {
+              modifiedXml = modifiedXml.slice(0, paragraphEnd + 6) + contentXml + modifiedXml.slice(paragraphEnd + 6);
+              console.log(`  ✅ Inserted content after "${fieldName}"`);
+            }
+          } else {
+            console.log(`  ⚠️  Could not find heading for "${fieldName}"`);
+          }
         }
-        return '';
       });
     }
     
