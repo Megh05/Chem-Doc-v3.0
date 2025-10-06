@@ -483,6 +483,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { jobId } = req.params;
       const { format, data } = req.body;
       
+      console.log('🔍 === DOCUMENT GENERATION DEBUG ===');
+      console.log('📥 Request jobId:', jobId);
+      console.log('📥 Request format:', format);
+      console.log('📥 Request data (from frontend):', data ? `provided with ${Object.keys(data).length} keys` : 'NOT provided');
+      if (data) {
+        console.log('📥 Request data keys:', Object.keys(data).slice(0, 5));
+        console.log('📥 Request data sample:', JSON.stringify(data).substring(0, 300));
+      }
+      
       // Find job by either id or documentId to support both cases
       const jobs = await storage.getProcessingJobs();
       const job = jobs.find(j => j.id === jobId || j.documentId === jobId);
@@ -490,10 +499,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Processing job not found" });
       }
 
+      console.log('💾 Job found - extractedData:', job.extractedData ? `has ${Object.keys(job.extractedData).length} keys` : 'EMPTY or NULL');
+      if (job.extractedData) {
+        console.log('💾 Job extractedData keys:', Object.keys(job.extractedData).slice(0, 5));
+      }
+
       const template = await storage.getTemplate(job.templateId);
       if (!template) {
         return res.status(404).json({ message: "Template not found" });
       }
+
+      console.log('📄 Template:', template.name, 'Type:', template.type);
 
       // Find template file
       const files = fs.readdirSync(uploadDir);
@@ -519,9 +535,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const templatePath = path.join(uploadDir, targetFile);
       const rawDocumentData = data || job.extractedData || {};
       
+      console.log('🔧 rawDocumentData source:', data ? 'from request.body.data' : (job.extractedData ? 'from job.extractedData' : 'empty object'));
+      console.log('🔧 rawDocumentData keys:', Object.keys(rawDocumentData).slice(0, 5));
+      
       // Normalize extracted data to clean field names
       const documentData = normalizeExtractedData(rawDocumentData);
-      console.log('🧹 Normalized document data:', documentData);
+      console.log('🧹 Normalized document data keys:', Object.keys(documentData).slice(0, 5));
+      console.log('🧹 Normalized document data sample:', JSON.stringify(documentData).substring(0, 300));
       
       // Get template structure for intelligent mapping
       const structure = await parseTemplateStructure(templatePath);
@@ -689,10 +709,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (format === 'docx') {
         // For MSDS templates, normalize data to use slug-based keys
         if (template.type === 'MSDS') {
+          console.log('🔍 DEBUG: MSDS Document Generation');
+          console.log('📥 Raw document data keys:', Object.keys(documentData));
+          console.log('📥 Raw document data sample:', Object.keys(documentData).slice(0, 3).map(k => `${k}: ${documentData[k]?.substring(0, 50)}...`));
+          
           // Normalize the document data to slugs (sec_01_identification, etc.)
           const normalizedDocumentData = normalizeMsdsSections(documentData);
           console.log('🧹 Normalized document data keys:', Object.keys(normalizedDocumentData));
-          console.log('📊 Sample data:', Object.keys(normalizedDocumentData).slice(0, 2).map(k => `${k}: ${normalizedDocumentData[k]?.substring(0, 30)}...`));
+          console.log('📊 Normalized data sample:', Object.keys(normalizedDocumentData).slice(0, 3).map(k => `${k}: ${normalizedDocumentData[k]?.substring(0, 50)}...`));
+          console.log('📊 All normalized data:', JSON.stringify(normalizedDocumentData, null, 2).substring(0, 500) + '...');
           
           // The template uses slug-based placeholders like {{sec_01_identification}}
           // So we use the normalized data directly

@@ -10,10 +10,16 @@ const simplify = (s: string) =>
 
 export function titleToSlug(rawTitle: string): SectionSlug | null {
   const key = simplify(rawTitle);
-  if (TITLE_TO_SLUG[key]) return TITLE_TO_SLUG[key];
+  console.log(`[titleToSlug] Raw: "${rawTitle}" → Simplified: "${key}"`);
+  
+  if (TITLE_TO_SLUG[key]) {
+    console.log(`[titleToSlug] Found in map: ${TITLE_TO_SLUG[key]}`);
+    return TITLE_TO_SLUG[key];
+  }
 
   const m = key.match(/^(\d{1,2})\s+(.+)$/);
   if (m) {
+    console.log(`[titleToSlug] Pattern matched: number="${m[1]}", rest="${m[2]}"`);
     switch (m[1]) {
       case "1":
         return "sec_01_identification";
@@ -48,9 +54,11 @@ export function titleToSlug(rawTitle: string): SectionSlug | null {
       case "16":
         return "sec_16_other";
       default:
+        console.log(`[titleToSlug] No case match for number: ${m[1]}`);
         return null;
     }
   }
+  console.log(`[titleToSlug] No match found for: "${rawTitle}"`);
   return null;
 }
 
