@@ -1,5 +1,4 @@
 import fs from "fs/promises";
-import createReport from "docx-templates";
 import { SECTION_SLUGS, type SectionSlug } from "./msds-slug-map";
 
 const PLACEHOLDER_REGEX = /\{\{\s*([a-z0-9_]+)\s*\}\}/gi;
@@ -58,7 +57,11 @@ export async function generateDocx(
   }
 
   const template = await fs.readFile(templatePath);
-  const report = await createReport({
+  
+  const docxTemplates = await import('docx-templates');
+  const createReportFn = docxTemplates.default || docxTemplates;
+  
+  const report = await createReportFn({
     template,
     data,
     cmdDelimiter: ["{{", "}}"],
