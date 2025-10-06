@@ -687,37 +687,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.send(Buffer.from(pdfBytes));
         
       } else if (format === 'docx') {
-        // For MSDS templates, normalize data and use field mapping
-        if (template.type === 'MSDS' && template.fieldMapping && template.fieldMapping.length > 0) {
-          // Normalize the document data to slugs
+        // For MSDS templates, normalize data to use slug-based keys
+        if (template.type === 'MSDS') {
+          // Normalize the document data to slugs (sec_01_identification, etc.)
           const normalizedDocumentData = normalizeMsdsSections(documentData);
           console.log('🧹 Normalized document data keys:', Object.keys(normalizedDocumentData));
+          console.log('📊 Sample data:', Object.keys(normalizedDocumentData).slice(0, 2).map(k => `${k}: ${normalizedDocumentData[k]?.substring(0, 30)}...`));
           
-          // Map from slugs to original field names using the stored fieldMapping
-          const slugMapping = createSlugMappingFromFieldArray(template.fieldMapping);
-          const mappedData: Record<string, string> = {};
-          
-          // Remap using the field mapping
-          for (const [slug, value] of Object.entries(normalizedDocumentData)) {
-            const fieldName = slugMapping[slug];
-            if (fieldName) {
-              mappedData[fieldName] = value as string;
-              console.log(`  ✅ Mapped ${slug} → "${fieldName}"`);
-            } else {
-              console.log(`  ⚠️  No mapping for ${slug}`);
-            }
-          }
-          
-          console.log('✅ Final mapped data keys:', Object.keys(mappedData));
-          
-          // Use the field mapping as intelligent mapping for fillTemplateWithData
-          const filledDocxBuffer = await fillTemplateWithData(templatePath, mappedData, template.fieldMapping);
+          // The template uses slug-based placeholders like {{sec_01_identification}}
+          // So we use the normalized data directly
+          const filledDocxBuffer = await fillTemplateWithData(templatePath, normalizedDocumentData, null);
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
           res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
           return res.send(filledDocxBuffer);
         }
 
-        // Fallback for non-MSDS or templates without field mapping
+        // Fallback for non-MSDS templates
         const filledDocxBuffer = await fillTemplateWithData(templatePath, documentData, intelligentMapping);
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         res.setHeader('Content-Disposition', `attachment; filename="${template.name}_filled.docx"`);
