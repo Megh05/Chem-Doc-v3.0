@@ -103,12 +103,14 @@ function cleanTextForLLM(text: string): string {
   
   // Use the new advanced repetitive content removal system
   let cleanedText = advancedRepetitiveContentRemoval(pre);
+  console.log(`📊 After advancedRepetitiveContentRemoval: ${cleanedText.length} chars`);
   
   // Additional LLM-specific cleanup
   // Remove image-related metadata
   cleanedText = cleanedText.replace(/<img[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
   cleanedText = cleanedText.replace(/<image[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
   cleanedText = cleanedText.replace(/src="[^"]*"/gi, 'src="[REMOVED]"');
+  console.log(`📊 After image removal: ${cleanedText.length} chars`);
   
   // Decode HTML entities first (preserve &gt;, &lt;, &amp; which are part of data)
   cleanedText = cleanedText.replace(/&gt;/g, '>');
@@ -116,9 +118,11 @@ function cleanTextForLLM(text: string): string {
   cleanedText = cleanedText.replace(/&amp;/g, '&');
   cleanedText = cleanedText.replace(/&nbsp;/g, ' ');
   cleanedText = cleanedText.replace(/&quot;/g, '"');
+  console.log(`📊 After HTML entity decoding: ${cleanedText.length} chars`);
   
   // Remove HTML tags that might contain image references (but data is already decoded)
   cleanedText = cleanedText.replace(/<(?!\/?(b|i|u|strong|em))[^>]*>/g, ' ');
+  console.log(`📊 After HTML tag removal: ${cleanedText.length} chars`);
   
   // Remove lines that are mostly special characters (likely corrupted image data)
   // BUT preserve table data and technical specifications
