@@ -91,14 +91,26 @@ export function advancedRepetitiveContentRemoval(text: string): string {
   cleanedText = cleanedText.replace(/[ \t]+/g, ' ');
   
   // Step 6: Remove lines that are mostly special characters
+  // BUT preserve table data and technical specifications
   const lines = cleanedText.split('\n');
   const filteredLines = lines.filter(line => {
     const cleanLine = line.trim();
     if (cleanLine.length === 0) return false;
     
-    // Remove lines that are mostly special characters
+    // Preserve lines that contain table markers or data patterns
+    if (cleanLine.includes('|') || cleanLine.includes('---')) return true;
+    
+    // Preserve lines with technical symbols common in specifications
+    const hasTechnicalSymbols = /[≥≤±%~×]|ppm|CFU|pH|Da/i.test(cleanLine);
+    if (hasTechnicalSymbols) return true;
+    
+    // Preserve lines with number-heavy content (likely specifications)
+    const numberRatio = (cleanLine.match(/[0-9]/g) || []).length / cleanLine.length;
+    if (numberRatio > 0.2) return true;
+    
+    // Only remove lines that are VERY special character heavy (>90%) and long
     const specialCharRatio = (cleanLine.match(/[^a-zA-Z0-9\s\u4e00-\u9fff]/g) || []).length / cleanLine.length;
-    if (specialCharRatio > 0.8 && cleanLine.length > 20) {
+    if (specialCharRatio > 0.9 && cleanLine.length > 30) {
       return false;
     }
     
@@ -132,8 +144,9 @@ export function cleanExtractedData(data: Record<string, any>): Record<string, an
     if (typeof value === 'string') {
       let cleanedValue = value.trim();
       
-      // Remove common OCR artifacts
-      cleanedValue = cleanedValue.replace(/[^\w\s\u4e00-\u9fff.,%()\-+x10^]/g, '');
+      // Preserve technical symbols and only remove truly problematic characters
+      // Keep: letters, numbers, spaces, Chinese, common punctuation, technical symbols (≥≤±~×/)
+      cleanedValue = cleanedValue.replace(/[^\w\s\u4e00-\u9fff.,%()\-+x10^≥≤±~×/:<>&;]/g, '');
       
       // Normalize whitespace
       cleanedValue = cleanedValue.replace(/\s+/g, ' ');
