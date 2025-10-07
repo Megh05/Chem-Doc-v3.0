@@ -110,12 +110,21 @@ function cleanTextForLLM(text: string): string {
   cleanedText = cleanedText.replace(/<image[^>]*>/gi, '[IMAGE_TAG_REMOVED]');
   cleanedText = cleanedText.replace(/src="[^"]*"/gi, 'src="[REMOVED]"');
   
-  // Remove HTML tags that might contain image references
-  cleanedText = cleanedText.replace(/<[^>]*>/g, ' ');
+  // Decode HTML entities first (preserve &gt;, &lt;, &amp; which are part of data)
+  cleanedText = cleanedText.replace(/&gt;/g, '>');
+  cleanedText = cleanedText.replace(/&lt;/g, '<');
+  cleanedText = cleanedText.replace(/&amp;/g, '&');
+  cleanedText = cleanedText.replace(/&nbsp;/g, ' ');
+  cleanedText = cleanedText.replace(/&quot;/g, '"');
+  
+  // Remove HTML tags that might contain image references (but data is already decoded)
+  cleanedText = cleanedText.replace(/<(?!\/?(b|i|u|strong|em))[^>]*>/g, ' ');
   
   // Remove lines that are mostly special characters (likely corrupted image data)
   // BUT preserve table data and technical specifications
   const lines = cleanedText.split('\n');
+  console.log(`🔍 Pre-filter: ${lines.length} lines, ${cleanedText.length} chars`);
+  
   const filteredLines = lines.filter(line => {
     const cleanLine = line.trim();
     if (cleanLine.length === 0) return false;
@@ -134,17 +143,20 @@ function cleanTextForLLM(text: string): string {
     // Only remove lines that are VERY special character heavy (>90%) and long
     const specialCharRatio = (cleanLine.match(/[^a-zA-Z0-9\s\u4e00-\u9fff]/g) || []).length / cleanLine.length;
     if (specialCharRatio > 0.9 && cleanLine.length > 30) {
+      console.log(`  ❌ Removed high special char line (${specialCharRatio.toFixed(2)}): ${cleanLine.substring(0, 50)}...`);
       return false;
     }
     
     // Remove lines that look like corrupted data (only special chars, no alphanumeric)
     if (cleanLine.match(/^[^\w\u4e00-\u9fff\s]+$/)) {
+      console.log(`  ❌ Removed corrupted line: ${cleanLine.substring(0, 50)}...`);
       return false;
     }
     
     return true;
   });
   
+  console.log(`🔍 Post-filter: ${filteredLines.length} lines kept, ${lines.length - filteredLines.length} lines removed`);
   cleanedText = filteredLines.join('\n');
   
   // Limit text length to prevent API issues (keep it reasonable for LLM processing)
