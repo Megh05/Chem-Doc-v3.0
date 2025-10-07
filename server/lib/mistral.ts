@@ -112,17 +112,27 @@ function cleanTextForLLM(text: string): string {
   cleanedText = cleanedText.replace(/src="[^"]*"/gi, 'src="[REMOVED]"');
   console.log(`📊 After image removal: ${cleanedText.length} chars`);
   
-  // Decode HTML entities first (preserve &gt;, &lt;, &amp; which are part of data)
-  cleanedText = cleanedText.replace(/&gt;/g, '>');
-  cleanedText = cleanedText.replace(/&lt;/g, '<');
-  cleanedText = cleanedText.replace(/&amp;/g, '&');
-  cleanedText = cleanedText.replace(/&nbsp;/g, ' ');
-  cleanedText = cleanedText.replace(/&quot;/g, '"');
-  console.log(`📊 After HTML entity decoding: ${cleanedText.length} chars`);
+  // Check if this is markdown content (has table markers)
+  const isMarkdown = cleanedText.includes('|') || cleanedText.includes('```');
+  console.log(`📊 Content type: ${isMarkdown ? 'Markdown' : 'HTML'}`);
   
-  // Remove HTML tags that might contain image references (but data is already decoded)
-  cleanedText = cleanedText.replace(/<(?!\/?(b|i|u|strong|em))[^>]*>/g, ' ');
-  console.log(`📊 After HTML tag removal: ${cleanedText.length} chars`);
+  if (isMarkdown) {
+    // For markdown, just decode &amp; (keep &gt; and &lt; as they might be in data)
+    cleanedText = cleanedText.replace(/&amp;/g, '&');
+    console.log(`📊 After minimal entity decoding for markdown: ${cleanedText.length} chars`);
+  } else {
+    // For HTML, decode entities and remove tags
+    cleanedText = cleanedText.replace(/&gt;/g, '>');
+    cleanedText = cleanedText.replace(/&lt;/g, '<');
+    cleanedText = cleanedText.replace(/&amp;/g, '&');
+    cleanedText = cleanedText.replace(/&nbsp;/g, ' ');
+    cleanedText = cleanedText.replace(/&quot;/g, '"');
+    console.log(`📊 After HTML entity decoding: ${cleanedText.length} chars`);
+    
+    // Remove HTML tags that might contain image references
+    cleanedText = cleanedText.replace(/<(?!\/?(b|i|u|strong|em))[^>]*>/g, ' ');
+    console.log(`📊 After HTML tag removal: ${cleanedText.length} chars`);
+  }
   
   // Remove lines that are mostly special characters (likely corrupted image data)
   // BUT preserve table data and technical specifications
