@@ -140,5 +140,36 @@
     "id": "0963c6e3-b1d3-4a97-91b3-5ed37e08f2bc",
     "createdAt": "2025-10-06T16:04:52.232Z",
     "updatedAt": "2025-10-06T16:04:52.232Z"
+  },
+  {
+    "name": "TDS",
+    "type": "TDS",
+    "fileName": "NTCB TDS COSCARE-H ACID.docx",
+    "fileSize": 257342,
+    "placeholders": [
+      "appearance",
+      "molecular_weight",
+      "sodium_hyaluronate_content",
+      "protein_content",
+      "loss_on_drying",
+      "ph_value",
+      "staphylococcus_aureus_status",
+      "pseudomonas_aeruginosa_status",
+      "heavy_metal_content",
+      "total_bacteria_count",
+      "yeast_and_molds_count",
+      "package_specification",
+      "shelf_life_duration",
+      "batch_number",
+      "manufacturing_date",
+      "expiration_date",
+      "certification_authority",
+      "certification_date",
+      "document_reference_number",
+      "storage_conditions_additional_notes"
+    ],
+    "id": "7c4e86fa-e83c-4dca-b395-3f4ecf95b516",
+    "createdAt": "2025-10-07T02:14:32.561Z",
+    "updatedAt": "2025-10-07T02:14:32.561Z"
   }
 ]
